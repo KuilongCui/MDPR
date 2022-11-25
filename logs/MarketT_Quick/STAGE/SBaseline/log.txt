@@ -1,0 +1,1461 @@
+[11/01 20:42:12] fastreid INFO: Rank of current process: 0. World size: 1
+[11/01 20:42:12] fastreid INFO: Environment info:
+----------------------  ------------------------------------------------------------------------------------------------------
+sys.platform            linux
+Python                  3.7.13 (default, Oct 18 2022, 18:57:03) [GCC 11.2.0]
+numpy                   1.21.5
+fastreid                1.3 @./fastreid
+FASTREID_ENV_MODULE     <not set>
+PyTorch                 1.12.0 @/home/ckl/anaconda3/envs/fastreid/lib/python3.7/site-packages/torch
+PyTorch debug build     False
+GPU available           True
+GPU 0                   NVIDIA GeForce RTX 3090
+CUDA_HOME               /usr
+Pillow                  9.2.0
+torchvision             0.13.0 @/home/ckl/anaconda3/envs/fastreid/lib/python3.7/site-packages/torchvision
+torchvision arch flags  /home/ckl/anaconda3/envs/fastreid/lib/python3.7/site-packages/torchvision/_C.so; cannot find cuobjdump
+cv2                     4.6.0
+----------------------  ------------------------------------------------------------------------------------------------------
+PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.6.0 (Git Hash 52b5f107dd9cf10910aaa19cb47f3abf9b349815)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 8.3.2  (built against CUDA 11.5)
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.3.2, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.12.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+[11/01 20:42:12] fastreid INFO: Command line arguments: Namespace(config_file='./configs/MarketT/SBaseline_Quick.yml', dist_url='tcp://127.0.0.1:50666', eval_only=False, machine_rank=0, num_gpus=1, num_machines=1, opts=['OUTPUT_DIR', 'logs/MarketT_Quick/STAGE/SBaseline'], resume=False)
+[11/01 20:42:12] fastreid INFO: Contents of args.config_file=./configs/MarketT/SBaseline_Quick.yml:
+_BASE_: ../Base-SBS.yml
+
+DATASETS:
+  NAMES: ("Market1501",)
+  TESTS: ("Market1501",)
+
+OUTPUT_DIR: logs/MarketT_Quick/Sbaseline_R50
+
+MODEL:
+  META_ARCHITECTURE: Sbaseline
+
+  DETACH_ATTN: False # bad
+
+  DETACH_ALL: False # bad
+
+  BACKBONE:
+    WITH_IBN: True
+    WITH_NL: True
+    PRETRAIN: True
+    EMBEDDING_DIM: 512
+
+    ATTACH_ACTIVATION: False # bad
+    ATTNSHAPED_ACTIVATION: False # bad
+    ADJ_KEEP: False
+
+    NORM: BN
+    # PRETRAIN_PATH: '/mnt21t/home/mm2022/fast-reid/weights/lup_moco_r50.pth'
+    # PRETRAIN_PATH: '/mnt21t/home/mm2022/fast-reid/weights/lupws_r50.pth'
+
+  LOSSES:
+    NAME: ("CrossEntropyLoss", "TripletLoss",)
+        
+  HEADS:
+    NORM: BN
+    ATTN: 8
+
+INPUT:
+  AUTOAUG:
+    ENABLED: False
+
+  RPT:
+    ENABLED: True
+
+  SIZE_TRAIN: [ 384, 192 ]
+
+  SIZE_TEST: [ 384, 192 ]
+
+SOLVER:
+  AMP:
+    ENABLED: True
+  IMS_PER_BATCH: 64
+
+  # MAX_EPOCH: 90
+
+  CHECKPOINT_PERIOD: 20
+
+  FREEZE_ITERS: 0
+
+TEST:
+  EVAL_PERIOD: 4
+  IMS_PER_BATCH: 64
+
+[11/01 20:42:12] fastreid INFO: Running with full config:
+ATTN_OUTPUT: False
+CUDNN_BENCHMARK: True
+DATALOADER:
+  NUM_INSTANCE: 16
+  NUM_WORKERS: 8
+  SAMPLER_TRAIN: NaiveIdentitySampler
+  SET_WEIGHT: []
+DATASETS:
+  COMBINEALL: False
+  NAMES: ('Market1501',)
+  TESTS: ('Market1501',)
+INPUT:
+  AFFINE:
+    ENABLED: False
+  AUGMIX:
+    ENABLED: False
+    PROB: 0.0
+  AUTOAUG:
+    ENABLED: False
+    PROB: 0.1
+  CJ:
+    BRIGHTNESS: 0.15
+    CONTRAST: 0.15
+    ENABLED: False
+    HUE: 0.1
+    PROB: 0.5
+    SATURATION: 0.1
+  CROP:
+    ENABLED: False
+    RATIO: [0.75, 1.3333333333333333]
+    SCALE: [0.16, 1]
+    SIZE: [224, 224]
+  FLIP:
+    ENABLED: True
+    PROB: 0.5
+  PADDING:
+    ENABLED: True
+    MODE: constant
+    SIZE: 10
+  REA:
+    ENABLED: True
+    PROB: 0.5
+    VALUE: [123.675, 116.28, 103.53]
+  RGPR:
+    ENABLED: False
+    PROB: 0.4
+  RPT:
+    ENABLED: True
+    PROB: 0.5
+  SIZE_TEST: [384, 192]
+  SIZE_TRAIN: [384, 192]
+KD:
+  EMA:
+    ENABLED: False
+    MOMENTUM: 0.999
+  MODEL_CONFIG: []
+  MODEL_WEIGHTS: []
+MISMTACH_OUTPUT: False
+MODEL:
+  BACKBONE:
+    ADJ_KEEP: False
+    ATTACH_ACTIVATION: False
+    ATTNSHAPED_ACTIVATION: False
+    ATT_DROP_RATE: 0.0
+    DEPTH: 50x
+    DROP_PATH_RATIO: 0.1
+    DROP_RATIO: 0.0
+    EMBEDDING_DIM: 512
+    FEAT_DIM: 2048
+    LAST_STRIDE: 1
+    NAME: build_resnet_backbone
+    NORM: BN
+    PRETRAIN: True
+    PRETRAIN_PATH: 
+    SIE_COE: 3.0
+    STRIDE_SIZE: (16, 16)
+    WITH_IBN: True
+    WITH_NL: True
+    WITH_SE: False
+  DETACH_ALL: False
+  DETACH_ATTN: False
+  DEVICE: cuda
+  DROP:
+    ENABLED: False
+    H_RATIO: 0.15
+    W_RATIO: 1.0
+  FREEZE_LAYERS: ['backbone']
+  HEADS:
+    ADDTION_POOL: 
+    ATTN: 8
+    CLS_LAYER: CircleSoftmax
+    EMBEDDING_DIM: 0
+    GAN: False
+    GAN_RATIO: 0.0
+    MARGIN: 0.35
+    NAME: EmbeddingHead
+    NECK_FEAT: after
+    NORM: BN
+    NUM_CLASSES: 0
+    POOL_LAYER: GeneralizedMeanPoolingP
+    SCALE: 64
+    WITH_BNNECK: True
+  LOSSES:
+    CE:
+      ALPHA: 0.2
+      ATTN_SCALE: 1.0
+      EPSILON: 0.1
+      MAIN_SCALE: 1.0
+      SCALE: 1.0
+    CENTER:
+      SCALE: 0.0005
+    CIRCLE:
+      GAMMA: 128
+      MARGIN: 0.25
+      SCALE: 1.0
+    COSFACE:
+      GAMMA: 128
+      MARGIN: 0.25
+      SCALE: 1.0
+    FL:
+      ALPHA: 0.25
+      GAMMA: 2
+      SCALE: 1.0
+    KL:
+      MARGIN: 1.0
+    NAME: ('CrossEntropyLoss', 'TripletLoss')
+    TRI:
+      ATTN: False
+      HARD_MINING: True
+      MARGIN: 0.0
+      NORM_FEAT: False
+      SCALE: 1.0
+  META_ARCHITECTURE: Sbaseline
+  PIXEL_MEAN: [123.675, 116.28, 103.53]
+  PIXEL_STD: [58.395, 57.120000000000005, 57.375]
+  QUEUE_SIZE: 8192
+  SWIN:
+    APE: False
+    DEPTHS: [2, 2, 6, 2]
+    EMBED_DIM: 96
+    IN_CHANS: 3
+    MLP_RATIO: 4.0
+    NUM_HEADS: [3, 6, 12, 24]
+    PATCH_NORM: True
+    PATCH_SIZE: 4
+    QKV_BIAS: True
+    QK_SCALE: None
+    WINDOW_SIZE: 7
+  WEIGHTS: 
+OUTPUT_DIR: logs/MarketT_Quick/STAGE/SBaseline
+SOLVER:
+  AMP:
+    ENABLED: True
+  BASE_LR: 0.00035
+  BIAS_LR_FACTOR: 1.0
+  CHECKPOINT_PERIOD: 20
+  CLIP_GRADIENTS:
+    CLIP_TYPE: norm
+    CLIP_VALUE: 5.0
+    ENABLED: False
+    NORM_TYPE: 2.0
+  DELAY_EPOCHS: 30
+  ETA_MIN_LR: 7e-07
+  FREEZE_ITERS: 0
+  GAMMA: 0.1
+  HEADS_LR_FACTOR: 1.0
+  IMS_PER_BATCH: 64
+  MAX_EPOCH: 60
+  MOMENTUM: 0.9
+  NESTEROV: False
+  OPT: Adam
+  SCHED: CosineAnnealingLR
+  STEPS: [40, 90]
+  WARMUP_FACTOR: 0.1
+  WARMUP_ITERS: 2000
+  WARMUP_METHOD: linear
+  WEIGHT_DECAY: 0.0005
+  WEIGHT_DECAY_BIAS: 0.0005
+  WEIGHT_DECAY_NORM: 0.0005
+TEST:
+  AQE:
+    ALPHA: 3.0
+    ENABLED: False
+    QE_K: 5
+    QE_TIME: 1
+  EVAL_PERIOD: 4
+  FLIP:
+    ENABLED: False
+  IMS_PER_BATCH: 64
+  METRIC: cosine
+  PRECISE_BN:
+    DATASET: Market1501
+    ENABLED: False
+    NUM_ITER: 300
+  RERANK:
+    ENABLED: False
+    K1: 20
+    K2: 6
+    LAMBDA: 0.3
+  ROC:
+    ENABLED: False
+[11/01 20:42:12] fastreid INFO: Full config saved to /home/ckl/fast-reid/logs/MarketT_Quick/STAGE/SBaseline/config.yaml
+[11/01 20:42:12] fastreid.engine.defaults INFO: Prepare training set
+[11/01 20:42:12] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| train    | 751     | 12936      | 6           |[0m
+[11/01 20:42:12] fastreid.data.build INFO: Using training sampler NaiveIdentitySampler
+[11/01 20:42:13] fastreid.engine.defaults INFO: Auto-scaling the num_classes=751
+[11/01 20:42:14] fastreid.modeling.backbones.resnet INFO: Loading pretrained model from /home/ckl/.cache/torch/checkpoints/resnet50_ibn_a-d9d0bb7b.pth
+[11/01 20:42:14] fastreid.modeling.backbones.resnet INFO: Some model parameters or buffers are not found in the checkpoint:
+  [34mNL_2.0.g.{weight, bias}[0m
+  [34mNL_2.0.W.0.{weight, bias}[0m
+  [34mNL_2.0.W.1.{weight, bias, running_mean, running_var}[0m
+  [34mNL_2.0.theta.{weight, bias}[0m
+  [34mNL_2.0.phi.{weight, bias}[0m
+  [34mNL_2.1.g.{weight, bias}[0m
+  [34mNL_2.1.W.0.{weight, bias}[0m
+  [34mNL_2.1.W.1.{weight, bias, running_mean, running_var}[0m
+  [34mNL_2.1.theta.{weight, bias}[0m
+  [34mNL_2.1.phi.{weight, bias}[0m
+  [34mNL_3.0.g.{weight, bias}[0m
+  [34mNL_3.0.W.0.{weight, bias}[0m
+  [34mNL_3.0.W.1.{weight, bias, running_mean, running_var}[0m
+  [34mNL_3.0.theta.{weight, bias}[0m
+  [34mNL_3.0.phi.{weight, bias}[0m
+  [34mNL_3.1.g.{weight, bias}[0m
+  [34mNL_3.1.W.0.{weight, bias}[0m
+  [34mNL_3.1.W.1.{weight, bias, running_mean, running_var}[0m
+  [34mNL_3.1.theta.{weight, bias}[0m
+  [34mNL_3.1.phi.{weight, bias}[0m
+  [34mNL_3.2.g.{weight, bias}[0m
+  [34mNL_3.2.W.0.{weight, bias}[0m
+  [34mNL_3.2.W.1.{weight, bias, running_mean, running_var}[0m
+  [34mNL_3.2.theta.{weight, bias}[0m
+  [34mNL_3.2.phi.{weight, bias}[0m
+[11/01 20:42:14] fastreid.modeling.backbones.resnet INFO: The checkpoint state_dict contains keys that are not used by the model:
+  [35mfc.{weight, bias}[0m
+[11/01 20:42:14] fastreid.engine.defaults INFO: Model:
+Sbaseline(
+  (backbone): ResNet(
+    (conv1): Conv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    (bn1): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (relu): ReLU(inplace=True)
+    (maxpool): MaxPool2d(kernel_size=3, stride=2, padding=0, dilation=1, ceil_mode=True)
+    (layer1): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+        (downsample): Sequential(
+          (0): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+    )
+    (layer2): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+        (downsample): Sequential(
+          (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+          (1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (3): Bottleneck(
+        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+    )
+    (layer3): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+        (downsample): Sequential(
+          (0): Conv2d(512, 1024, kernel_size=(1, 1), stride=(2, 2), bias=False)
+          (1): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (3): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (4): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (5): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+    )
+    (layer4): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+        (downsample): Sequential(
+          (0): Conv2d(1024, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+    )
+    (NL_1): ModuleList()
+    (NL_2): ModuleList(
+      (0): Non_local(
+        (g): Conv2d(512, 1, kernel_size=(1, 1), stride=(1, 1))
+        (W): Sequential(
+          (0): Conv2d(1, 512, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (theta): Conv2d(512, 1, kernel_size=(1, 1), stride=(1, 1))
+        (phi): Conv2d(512, 1, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (1): Non_local(
+        (g): Conv2d(512, 1, kernel_size=(1, 1), stride=(1, 1))
+        (W): Sequential(
+          (0): Conv2d(1, 512, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (theta): Conv2d(512, 1, kernel_size=(1, 1), stride=(1, 1))
+        (phi): Conv2d(512, 1, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (NL_3): ModuleList(
+      (0): Non_local(
+        (g): Conv2d(1024, 1, kernel_size=(1, 1), stride=(1, 1))
+        (W): Sequential(
+          (0): Conv2d(1, 1024, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (theta): Conv2d(1024, 1, kernel_size=(1, 1), stride=(1, 1))
+        (phi): Conv2d(1024, 1, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (1): Non_local(
+        (g): Conv2d(1024, 1, kernel_size=(1, 1), stride=(1, 1))
+        (W): Sequential(
+          (0): Conv2d(1, 1024, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (theta): Conv2d(1024, 1, kernel_size=(1, 1), stride=(1, 1))
+        (phi): Conv2d(1024, 1, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (2): Non_local(
+        (g): Conv2d(1024, 1, kernel_size=(1, 1), stride=(1, 1))
+        (W): Sequential(
+          (0): Conv2d(1, 1024, kernel_size=(1, 1), stride=(1, 1))
+          (1): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (theta): Conv2d(1024, 1, kernel_size=(1, 1), stride=(1, 1))
+        (phi): Conv2d(1024, 1, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (NL_4): ModuleList()
+  )
+  (heads): EmbeddingHead(
+    (pool_layer): GeneralizedMeanPoolingP(Parameter containing:
+    tensor([3.], device='cuda:0', requires_grad=True), output_size=(1, 1))
+    (bottleneck): Sequential(
+      (0): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (cls_layer): CircleSoftmax(num_classes=751, scale=64, margin=0.35)
+  )
+  (upSamper3): Embedding(
+    (embedding): Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1))
+    (bn): IBN(
+      (IN): InstanceNorm2d(4, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+      (BN): BatchNorm(4, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (relu): ReLU()
+  )
+  (upSamper2): UpSamper(
+    (up2): Sequential(
+      (0): ConvTranspose2d(8, 8, kernel_size=(2, 2), stride=(2, 2))
+      (1): Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (bn): IBN(
+      (IN): InstanceNorm2d(4, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+      (BN): BatchNorm(4, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (relu): ReLU()
+  )
+  (upSamper1): UpSamper(
+    (up2): Sequential(
+      (0): ConvTranspose2d(8, 8, kernel_size=(2, 2), stride=(2, 2))
+      (1): Conv2d(8, 8, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (bn): IBN(
+      (IN): InstanceNorm2d(4, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+      (BN): BatchNorm(4, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (relu): ReLU()
+  )
+  (attention_maker): BasicConv2d(
+    (conv): Conv2d(2048, 8, kernel_size=(1, 1), stride=(1, 1), bias=False)
+    (bn): IBN(
+      (IN): InstanceNorm2d(4, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+      (BN): BatchNorm(4, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+  )
+  (attach): Attach(
+    (pool): GeneralizedMeanPoolingP(Parameter containing:
+    tensor([3.], device='cuda:0', requires_grad=True), output_size=(1, 1))
+    (embedding_layer): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+  )
+  (attnShaped3): AttnShaped()
+  (attnShaped2): AttnShaped()
+  (attnShaped1): AttnShaped()
+  (backbone1): Sequential(
+    (0): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+        (downsample): Sequential(
+          (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+          (1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (3): Bottleneck(
+        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+    )
+    (1): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+        (downsample): Sequential(
+          (0): Conv2d(512, 1024, kernel_size=(1, 1), stride=(2, 2), bias=False)
+          (1): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (3): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (4): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (5): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+    )
+    (2): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+        (downsample): Sequential(
+          (0): Conv2d(1024, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+    )
+  )
+  (head1): EmbeddingHead(
+    (pool_layer): GeneralizedMeanPoolingP(Parameter containing:
+    tensor([3.], device='cuda:0', requires_grad=True), output_size=(1, 1))
+    (bottleneck): Sequential(
+      (0): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (cls_layer): CircleSoftmax(num_classes=751, scale=64, margin=0.35)
+  )
+  (backbone2): Sequential(
+    (0): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+        (downsample): Sequential(
+          (0): Conv2d(512, 1024, kernel_size=(1, 1), stride=(2, 2), bias=False)
+          (1): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (3): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (4): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (5): Bottleneck(
+        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): IBN(
+          (IN): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+          (BN): BatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+    )
+    (1): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+        (downsample): Sequential(
+          (0): Conv2d(1024, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+    )
+  )
+  (head2): EmbeddingHead(
+    (pool_layer): GeneralizedMeanPoolingP(Parameter containing:
+    tensor([3.], device='cuda:0', requires_grad=True), output_size=(1, 1))
+    (bottleneck): Sequential(
+      (0): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (cls_layer): CircleSoftmax(num_classes=751, scale=64, margin=0.35)
+  )
+  (backbone3): Sequential(
+    (0): Sequential(
+      (0): Bottleneck(
+        (conv1): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+        (downsample): Sequential(
+          (0): Conv2d(1024, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (1): Bottleneck(
+        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+      (2): Bottleneck(
+        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn1): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn2): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn3): BatchNorm(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+        (se): Identity()
+      )
+    )
+  )
+  (head3): EmbeddingHead(
+    (pool_layer): GeneralizedMeanPoolingP(Parameter containing:
+    tensor([3.], device='cuda:0', requires_grad=True), output_size=(1, 1))
+    (bottleneck): Sequential(
+      (0): BatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (cls_layer): CircleSoftmax(num_classes=751, scale=64, margin=0.35)
+  )
+  (attn_head): EmbeddingHead(
+    (pool_layer): Identity()
+    (bottleneck): Sequential(
+      (0): BatchNorm(4096, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (cls_layer): CircleSoftmax(num_classes=751, scale=64, margin=0.35)
+  )
+  (embedding4): Embedding(
+    (embedding): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+    (bn): IBN(
+      (IN): InstanceNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+      (BN): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (relu): ReLU()
+  )
+  (embedding3): Embedding(
+    (embedding): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+    (bn): IBN(
+      (IN): InstanceNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+      (BN): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (relu): ReLU()
+  )
+  (embedding2): Embedding(
+    (embedding): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+    (bn): IBN(
+      (IN): InstanceNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+      (BN): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (relu): ReLU()
+  )
+  (embedding1): Embedding(
+    (embedding): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+    (bn): IBN(
+      (IN): InstanceNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=False)
+      (BN): BatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (relu): ReLU()
+  )
+)
+[11/01 20:42:15] fastreid.utils.checkpoint INFO: No checkpoint found. Training model from scratch
+[11/01 20:42:15] fastreid.engine.train_loop INFO: Starting training from epoch 0
+[11/01 20:43:58] fastreid.utils.events INFO:  eta: 1:35:30  epoch/iter: 0/199  total_loss: 270.9  loss_cls_b1: 50.27  loss_cls_b2: 50.23  loss_cls_b3: 50.25  loss_cls_b4: 50.24  loss_cls_attn: 50.17  loss_triplet_b1: 4.382  loss_triplet_b2: 5.372  loss_triplet_b3: 5.126  loss_triplet_b4: 4.602  time: 0.4792  data_time: 0.0008  lr: 6.49e-05  max_mem: 16994M
+[11/01 20:43:59] fastreid.utils.events INFO:  eta: 1:35:29  epoch/iter: 0/201  total_loss: 270.8  loss_cls_b1: 50.27  loss_cls_b2: 50.23  loss_cls_b3: 50.23  loss_cls_b4: 50.24  loss_cls_attn: 50.17  loss_triplet_b1: 4.362  loss_triplet_b2: 5.337  loss_triplet_b3: 5.121  loss_triplet_b4: 4.576  time: 0.4793  data_time: 0.0008  lr: 6.52e-05  max_mem: 16994M
+[11/01 20:45:36] fastreid.utils.events INFO:  eta: 1:34:07  epoch/iter: 1/399  total_loss: 260.4  loss_cls_b1: 48.99  loss_cls_b2: 48.81  loss_cls_b3: 48.93  loss_cls_b4: 48.76  loss_cls_attn: 49.51  loss_triplet_b1: 3.734  loss_triplet_b2: 3.907  loss_triplet_b3: 3.88  loss_triplet_b4: 3.784  time: 0.4813  data_time: 0.0006  lr: 9.64e-05  max_mem: 16994M
+[11/01 20:45:38] fastreid.utils.events INFO:  eta: 1:34:06  epoch/iter: 1/403  total_loss: 260.3  loss_cls_b1: 48.98  loss_cls_b2: 48.81  loss_cls_b3: 48.95  loss_cls_b4: 48.73  loss_cls_attn: 49.5  loss_triplet_b1: 3.699  loss_triplet_b2: 3.879  loss_triplet_b3: 3.873  loss_triplet_b4: 3.776  time: 0.4813  data_time: 0.0007  lr: 9.71e-05  max_mem: 16994M
+[11/01 20:47:14] fastreid.utils.events INFO:  eta: 1:32:37  epoch/iter: 2/599  total_loss: 246.5  loss_cls_b1: 46.52  loss_cls_b2: 46.43  loss_cls_b3: 46.06  loss_cls_b4: 46.19  loss_cls_attn: 47.38  loss_triplet_b1: 3.552  loss_triplet_b2: 3.513  loss_triplet_b3: 3.465  loss_triplet_b4: 3.48  time: 0.4819  data_time: 0.0003  lr: 1.28e-04  max_mem: 16994M
+[11/01 20:47:17] fastreid.utils.events INFO:  eta: 1:32:35  epoch/iter: 2/605  total_loss: 246.2  loss_cls_b1: 46.42  loss_cls_b2: 46.32  loss_cls_b3: 46.05  loss_cls_b4: 46.11  loss_cls_attn: 47.31  loss_triplet_b1: 3.55  loss_triplet_b2: 3.522  loss_triplet_b3: 3.465  loss_triplet_b4: 3.48  time: 0.4819  data_time: 0.0004  lr: 1.29e-04  max_mem: 16994M
+[11/01 20:48:52] fastreid.utils.events INFO:  eta: 1:31:03  epoch/iter: 3/799  total_loss: 221.4  loss_cls_b1: 42.24  loss_cls_b2: 41.94  loss_cls_b3: 41.46  loss_cls_b4: 41.67  loss_cls_attn: 42.59  loss_triplet_b1: 3.266  loss_triplet_b2: 3.119  loss_triplet_b3: 3.117  loss_triplet_b4: 3.225  time: 0.4821  data_time: 0.0004  lr: 1.59e-04  max_mem: 16994M
+[11/01 20:48:56] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 20:48:57] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 20:48:57] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 20:49:02] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2675 s / batch. ETA=0:01:18
+[11/01 20:49:32] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2675 s / batch. ETA=0:00:48
+[11/01 20:50:02] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2676 s / batch. ETA=0:00:17
+[11/01 20:50:21] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:20.706971 (0.271741 s / batch per device, on 1 devices)
+[11/01 20:50:21] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:20 (0.270659 s / batch per device, on 1 devices)
+[11/01 20:50:25] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 20:50:25] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 52.55    | 73.81    | 81.47     | 31.24 | 6.48   | 41.90    |[0m
+[11/01 20:50:25] fastreid.utils.events INFO:  eta: 1:30:59  epoch/iter: 3/807  total_loss: 220.9  loss_cls_b1: 42.21  loss_cls_b2: 41.75  loss_cls_b3: 41.39  loss_cls_b4: 41.57  loss_cls_attn: 42.37  loss_triplet_b1: 3.23  loss_triplet_b2: 3.035  loss_triplet_b3: 3.007  loss_triplet_b4: 3.158  time: 0.4822  data_time: 0.0004  lr: 1.61e-04  max_mem: 16994M
+[11/01 20:51:59] fastreid.utils.events INFO:  eta: 1:29:17  epoch/iter: 4/999  total_loss: 189.9  loss_cls_b1: 36.51  loss_cls_b2: 35.98  loss_cls_b3: 35.76  loss_cls_b4: 35.31  loss_cls_attn: 36.01  loss_triplet_b1: 2.8  loss_triplet_b2: 2.386  loss_triplet_b3: 2.541  loss_triplet_b4: 2.537  time: 0.4815  data_time: 0.0004  lr: 1.91e-04  max_mem: 16994M
+[11/01 20:52:04] fastreid.utils.events INFO:  eta: 1:29:13  epoch/iter: 4/1009  total_loss: 188.9  loss_cls_b1: 36.28  loss_cls_b2: 35.71  loss_cls_b3: 35.35  loss_cls_b4: 35.21  loss_cls_attn: 35.75  loss_triplet_b1: 2.781  loss_triplet_b2: 2.367  loss_triplet_b3: 2.53  loss_triplet_b4: 2.525  time: 0.4815  data_time: 0.0004  lr: 1.93e-04  max_mem: 16994M
+[11/01 20:53:36] fastreid.utils.events INFO:  eta: 1:27:41  epoch/iter: 5/1199  total_loss: 159.9  loss_cls_b1: 31.03  loss_cls_b2: 30.42  loss_cls_b3: 30.33  loss_cls_b4: 29.84  loss_cls_attn: 30.49  loss_triplet_b1: 2.06  loss_triplet_b2: 1.868  loss_triplet_b3: 1.944  loss_triplet_b4: 2.061  time: 0.4814  data_time: 0.0004  lr: 2.22e-04  max_mem: 16994M
+[11/01 20:53:42] fastreid.utils.events INFO:  eta: 1:27:35  epoch/iter: 5/1211  total_loss: 159  loss_cls_b1: 30.77  loss_cls_b2: 30.15  loss_cls_b3: 30.18  loss_cls_b4: 29.7  loss_cls_attn: 30.23  loss_triplet_b1: 2.055  loss_triplet_b2: 1.895  loss_triplet_b3: 1.92  loss_triplet_b4: 2.043  time: 0.4814  data_time: 0.0004  lr: 2.24e-04  max_mem: 16994M
+[11/01 20:55:14] fastreid.utils.events INFO:  eta: 1:25:59  epoch/iter: 6/1399  total_loss: 141.9  loss_cls_b1: 27.47  loss_cls_b2: 27.07  loss_cls_b3: 27.16  loss_cls_b4: 26.58  loss_cls_attn: 27.06  loss_triplet_b1: 1.953  loss_triplet_b2: 1.712  loss_triplet_b3: 1.73  loss_triplet_b4: 1.811  time: 0.4811  data_time: 0.0004  lr: 2.54e-04  max_mem: 16994M
+[11/01 20:55:21] fastreid.utils.events INFO:  eta: 1:25:52  epoch/iter: 6/1413  total_loss: 141.5  loss_cls_b1: 27.37  loss_cls_b2: 27.02  loss_cls_b3: 26.91  loss_cls_b4: 26.42  loss_cls_attn: 26.98  loss_triplet_b1: 1.904  loss_triplet_b2: 1.687  loss_triplet_b3: 1.691  loss_triplet_b4: 1.766  time: 0.4811  data_time: 0.0004  lr: 2.56e-04  max_mem: 16994M
+[11/01 20:56:52] fastreid.utils.events INFO:  eta: 1:24:21  epoch/iter: 7/1599  total_loss: 130  loss_cls_b1: 24.62  loss_cls_b2: 24.26  loss_cls_b3: 24.24  loss_cls_b4: 23.89  loss_cls_attn: 24.87  loss_triplet_b1: 1.533  loss_triplet_b2: 1.443  loss_triplet_b3: 1.502  loss_triplet_b4: 1.509  time: 0.4811  data_time: 0.0004  lr: 2.85e-04  max_mem: 16994M
+[11/01 20:57:00] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 20:57:00] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 20:57:00] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 20:57:03] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2655 s / batch. ETA=0:01:21
+[11/01 20:57:33] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2677 s / batch. ETA=0:00:48
+[11/01 20:58:03] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2678 s / batch. ETA=0:00:18
+[11/01 20:58:21] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.798628 (0.268682 s / batch per device, on 1 devices)
+[11/01 20:58:21] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.267204 s / batch per device, on 1 devices)
+[11/01 20:58:26] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 20:58:26] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 80.64    | 92.67    | 95.16     | 60.91 | 24.86  | 70.77    |[0m
+[11/01 20:58:26] fastreid.utils.events INFO:  eta: 1:24:13  epoch/iter: 7/1615  total_loss: 127.2  loss_cls_b1: 24.45  loss_cls_b2: 24.07  loss_cls_b3: 24.11  loss_cls_b4: 23.82  loss_cls_attn: 24.68  loss_triplet_b1: 1.547  loss_triplet_b2: 1.462  loss_triplet_b3: 1.495  loss_triplet_b4: 1.494  time: 0.4811  data_time: 0.0004  lr: 2.88e-04  max_mem: 16994M
+[11/01 20:59:56] fastreid.utils.events INFO:  eta: 1:22:42  epoch/iter: 8/1799  total_loss: 117.1  loss_cls_b1: 22.31  loss_cls_b2: 22.38  loss_cls_b3: 22.35  loss_cls_b4: 21.95  loss_cls_attn: 22.69  loss_triplet_b1: 1.162  loss_triplet_b2: 1.112  loss_triplet_b3: 1.216  loss_triplet_b4: 1.168  time: 0.4809  data_time: 0.0004  lr: 3.17e-04  max_mem: 16994M
+[11/01 21:00:04] fastreid.utils.events INFO:  eta: 1:22:33  epoch/iter: 8/1817  total_loss: 115.1  loss_cls_b1: 22.06  loss_cls_b2: 22.02  loss_cls_b3: 21.83  loss_cls_b4: 21.6  loss_cls_attn: 22.35  loss_triplet_b1: 1.102  loss_triplet_b2: 1.068  loss_triplet_b3: 1.108  loss_triplet_b4: 1.089  time: 0.4809  data_time: 0.0005  lr: 3.20e-04  max_mem: 16994M
+[11/01 21:01:33] fastreid.utils.events INFO:  eta: 1:21:06  epoch/iter: 9/1999  total_loss: 108.8  loss_cls_b1: 21.11  loss_cls_b2: 21.02  loss_cls_b3: 20.94  loss_cls_b4: 20.36  loss_cls_attn: 21.22  loss_triplet_b1: 1.035  loss_triplet_b2: 0.8978  loss_triplet_b3: 0.9966  loss_triplet_b4: 1.042  time: 0.4807  data_time: 0.0004  lr: 3.48e-04  max_mem: 16994M
+[11/01 21:01:43] fastreid.utils.events INFO:  eta: 1:20:56  epoch/iter: 9/2019  total_loss: 108.8  loss_cls_b1: 21.14  loss_cls_b2: 21.02  loss_cls_b3: 20.85  loss_cls_b4: 20.45  loss_cls_attn: 21.1  loss_triplet_b1: 1.074  loss_triplet_b2: 0.9532  loss_triplet_b3: 1.098  loss_triplet_b4: 1.081  time: 0.4808  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:03:10] fastreid.utils.events INFO:  eta: 1:19:33  epoch/iter: 10/2199  total_loss: 102.9  loss_cls_b1: 19.91  loss_cls_b2: 19.56  loss_cls_b3: 19.66  loss_cls_b4: 19.47  loss_cls_attn: 20.24  loss_triplet_b1: 1.021  loss_triplet_b2: 0.9474  loss_triplet_b3: 0.9812  loss_triplet_b4: 1.04  time: 0.4814  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:03:21] fastreid.utils.events INFO:  eta: 1:19:23  epoch/iter: 10/2221  total_loss: 102.4  loss_cls_b1: 19.59  loss_cls_b2: 19.45  loss_cls_b3: 19.44  loss_cls_b4: 19.13  loss_cls_attn: 19.86  loss_triplet_b1: 0.9241  loss_triplet_b2: 0.906  loss_triplet_b3: 0.9469  loss_triplet_b4: 1.006  time: 0.4814  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:04:48] fastreid.utils.events INFO:  eta: 1:18:04  epoch/iter: 11/2399  total_loss: 96.3  loss_cls_b1: 18.4  loss_cls_b2: 18.49  loss_cls_b3: 18.26  loss_cls_b4: 18.39  loss_cls_attn: 18.83  loss_triplet_b1: 0.9144  loss_triplet_b2: 0.8288  loss_triplet_b3: 0.8588  loss_triplet_b4: 0.9237  time: 0.4817  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:04:59] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 21:05:00] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 21:05:00] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 21:05:03] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2661 s / batch. ETA=0:01:20
+[11/01 21:05:33] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2678 s / batch. ETA=0:00:48
+[11/01 21:06:03] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2679 s / batch. ETA=0:00:18
+[11/01 21:06:21] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.754796 (0.268535 s / batch per device, on 1 devices)
+[11/01 21:06:21] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.267249 s / batch per device, on 1 devices)
+[11/01 21:06:26] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 21:06:26] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 86.61    | 94.86    | 97.03     | 69.62 | 33.57  | 78.12    |[0m
+[11/01 21:06:26] fastreid.utils.events INFO:  eta: 1:17:55  epoch/iter: 11/2423  total_loss: 94.11  loss_cls_b1: 18.11  loss_cls_b2: 18.11  loss_cls_b3: 18.04  loss_cls_b4: 17.95  loss_cls_attn: 18.6  loss_triplet_b1: 0.9453  loss_triplet_b2: 0.8533  loss_triplet_b3: 0.8981  loss_triplet_b4: 0.9576  time: 0.4818  data_time: 0.0006  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:07:51] fastreid.utils.events INFO:  eta: 1:16:41  epoch/iter: 12/2599  total_loss: 87.4  loss_cls_b1: 17.22  loss_cls_b2: 17.05  loss_cls_b3: 16.98  loss_cls_b4: 16.8  loss_cls_attn: 17.42  loss_triplet_b1: 0.7432  loss_triplet_b2: 0.6865  loss_triplet_b3: 0.7886  loss_triplet_b4: 0.7663  time: 0.4821  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:08:04] fastreid.utils.events INFO:  eta: 1:16:29  epoch/iter: 12/2625  total_loss: 86.67  loss_cls_b1: 16.93  loss_cls_b2: 16.77  loss_cls_b3: 16.64  loss_cls_b4: 16.5  loss_cls_attn: 16.92  loss_triplet_b1: 0.7316  loss_triplet_b2: 0.6586  loss_triplet_b3: 0.7007  loss_triplet_b4: 0.7228  time: 0.4821  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:09:28] fastreid.utils.events INFO:  eta: 1:15:09  epoch/iter: 13/2799  total_loss: 83.5  loss_cls_b1: 16.18  loss_cls_b2: 16.02  loss_cls_b3: 16.15  loss_cls_b4: 15.9  loss_cls_attn: 16.24  loss_triplet_b1: 0.7406  loss_triplet_b2: 0.647  loss_triplet_b3: 0.6865  loss_triplet_b4: 0.7353  time: 0.4822  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:09:41] fastreid.utils.events INFO:  eta: 1:14:55  epoch/iter: 13/2827  total_loss: 83.42  loss_cls_b1: 16.09  loss_cls_b2: 16.02  loss_cls_b3: 16.3  loss_cls_b4: 15.9  loss_cls_attn: 16.25  loss_triplet_b1: 0.6679  loss_triplet_b2: 0.6578  loss_triplet_b3: 0.667  loss_triplet_b4: 0.7423  time: 0.4822  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:11:05] fastreid.utils.events INFO:  eta: 1:13:42  epoch/iter: 14/2999  total_loss: 81.36  loss_cls_b1: 15.76  loss_cls_b2: 15.66  loss_cls_b3: 15.64  loss_cls_b4: 15.5  loss_cls_attn: 15.97  loss_triplet_b1: 0.6604  loss_triplet_b2: 0.6199  loss_triplet_b3: 0.6172  loss_triplet_b4: 0.7044  time: 0.4823  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:11:19] fastreid.utils.events INFO:  eta: 1:13:29  epoch/iter: 14/3029  total_loss: 80.84  loss_cls_b1: 15.48  loss_cls_b2: 15.52  loss_cls_b3: 15.38  loss_cls_b4: 15.42  loss_cls_attn: 15.8  loss_triplet_b1: 0.6362  loss_triplet_b2: 0.5782  loss_triplet_b3: 0.5594  loss_triplet_b4: 0.6312  time: 0.4824  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:12:43] fastreid.utils.events INFO:  eta: 1:12:12  epoch/iter: 15/3199  total_loss: 77.7  loss_cls_b1: 15.23  loss_cls_b2: 14.85  loss_cls_b3: 14.87  loss_cls_b4: 14.86  loss_cls_attn: 15.23  loss_triplet_b1: 0.5141  loss_triplet_b2: 0.4976  loss_triplet_b3: 0.4839  loss_triplet_b4: 0.5674  time: 0.4828  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:12:58] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 21:12:58] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 21:12:58] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 21:13:02] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2658 s / batch. ETA=0:01:20
+[11/01 21:13:32] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2677 s / batch. ETA=0:00:48
+[11/01 21:14:02] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2677 s / batch. ETA=0:00:18
+[11/01 21:14:20] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.733062 (0.268461 s / batch per device, on 1 devices)
+[11/01 21:14:20] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.267121 s / batch per device, on 1 devices)
+[11/01 21:14:24] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 21:14:24] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 91.03    | 96.70    | 98.07     | 77.43 | 44.04  | 84.23    |[0m
+[11/01 21:14:25] fastreid.utils.events INFO:  eta: 1:11:58  epoch/iter: 15/3231  total_loss: 77.7  loss_cls_b1: 15.05  loss_cls_b2: 14.85  loss_cls_b3: 15.03  loss_cls_b4: 14.86  loss_cls_attn: 15.06  loss_triplet_b1: 0.5654  loss_triplet_b2: 0.5325  loss_triplet_b3: 0.5863  loss_triplet_b4: 0.6208  time: 0.4828  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:15:47] fastreid.utils.events INFO:  eta: 1:10:40  epoch/iter: 16/3399  total_loss: 75.51  loss_cls_b1: 14.63  loss_cls_b2: 14.57  loss_cls_b3: 14.71  loss_cls_b4: 14.41  loss_cls_attn: 14.77  loss_triplet_b1: 0.5838  loss_triplet_b2: 0.5342  loss_triplet_b3: 0.5887  loss_triplet_b4: 0.6345  time: 0.4830  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:16:03] fastreid.utils.events INFO:  eta: 1:10:23  epoch/iter: 16/3433  total_loss: 74.66  loss_cls_b1: 14.39  loss_cls_b2: 14.25  loss_cls_b3: 14.39  loss_cls_b4: 14.2  loss_cls_attn: 14.46  loss_triplet_b1: 0.5267  loss_triplet_b2: 0.4915  loss_triplet_b3: 0.5449  loss_triplet_b4: 0.6082  time: 0.4831  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:17:24] fastreid.utils.events INFO:  eta: 1:09:06  epoch/iter: 17/3599  total_loss: 70.82  loss_cls_b1: 13.81  loss_cls_b2: 13.58  loss_cls_b3: 13.77  loss_cls_b4: 13.66  loss_cls_attn: 13.77  loss_triplet_b1: 0.4507  loss_triplet_b2: 0.4708  loss_triplet_b3: 0.4791  loss_triplet_b4: 0.466  time: 0.4832  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:17:41] fastreid.utils.events INFO:  eta: 1:08:47  epoch/iter: 17/3635  total_loss: 69.38  loss_cls_b1: 13.62  loss_cls_b2: 13.37  loss_cls_b3: 13.63  loss_cls_b4: 13.46  loss_cls_attn: 13.68  loss_triplet_b1: 0.4369  loss_triplet_b2: 0.4381  loss_triplet_b3: 0.4609  loss_triplet_b4: 0.4604  time: 0.4833  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:19:01] fastreid.utils.events INFO:  eta: 1:07:36  epoch/iter: 18/3799  total_loss: 67.94  loss_cls_b1: 13.13  loss_cls_b2: 12.95  loss_cls_b3: 13.23  loss_cls_b4: 13.11  loss_cls_attn: 13.48  loss_triplet_b1: 0.4302  loss_triplet_b2: 0.4045  loss_triplet_b3: 0.4646  loss_triplet_b4: 0.4724  time: 0.4834  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:19:20] fastreid.utils.events INFO:  eta: 1:07:20  epoch/iter: 18/3837  total_loss: 67.82  loss_cls_b1: 13.06  loss_cls_b2: 12.95  loss_cls_b3: 13.13  loss_cls_b4: 13  loss_cls_attn: 13.48  loss_triplet_b1: 0.421  loss_triplet_b2: 0.41  loss_triplet_b3: 0.459  loss_triplet_b4: 0.45  time: 0.4834  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:20:38] fastreid.utils.events INFO:  eta: 1:06:01  epoch/iter: 19/3999  total_loss: 64.5  loss_cls_b1: 12.4  loss_cls_b2: 12.33  loss_cls_b3: 12.5  loss_cls_b4: 12.48  loss_cls_attn: 12.71  loss_triplet_b1: 0.3622  loss_triplet_b2: 0.3515  loss_triplet_b3: 0.4054  loss_triplet_b4: 0.4407  time: 0.4834  data_time: 0.0006  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:20:57] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 21:20:57] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 21:20:57] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 21:21:01] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2659 s / batch. ETA=0:01:20
+[11/01 21:21:31] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2678 s / batch. ETA=0:00:48
+[11/01 21:22:01] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2677 s / batch. ETA=0:00:18
+[11/01 21:22:19] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.727248 (0.268442 s / batch per device, on 1 devices)
+[11/01 21:22:19] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.267124 s / batch per device, on 1 devices)
+[11/01 21:22:23] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 21:22:23] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 91.63    | 97.21    | 98.40     | 80.50 | 49.04  | 86.06    |[0m
+[11/01 21:22:24] fastreid.utils.checkpoint INFO: Saving checkpoint to logs/MarketT_Quick/STAGE/SBaseline/model_best.pth
+[11/01 21:22:26] fastreid.utils.checkpoint INFO: Saving checkpoint to logs/MarketT_Quick/STAGE/SBaseline/model_0019.pth
+[11/01 21:22:28] fastreid.utils.events INFO:  eta: 1:05:38  epoch/iter: 19/4039  total_loss: 64.09  loss_cls_b1: 12.36  loss_cls_b2: 12.29  loss_cls_b3: 12.47  loss_cls_b4: 12.43  loss_cls_attn: 12.68  loss_triplet_b1: 0.3622  loss_triplet_b2: 0.3648  loss_triplet_b3: 0.409  loss_triplet_b4: 0.4496  time: 0.4834  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:23:46] fastreid.utils.events INFO:  eta: 1:04:08  epoch/iter: 20/4199  total_loss: 63.15  loss_cls_b1: 12.35  loss_cls_b2: 12.31  loss_cls_b3: 12.2  loss_cls_b4: 12.25  loss_cls_attn: 12.73  loss_triplet_b1: 0.3673  loss_triplet_b2: 0.3634  loss_triplet_b3: 0.3647  loss_triplet_b4: 0.3714  time: 0.4835  data_time: 0.0006  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:24:06] fastreid.utils.events INFO:  eta: 1:03:46  epoch/iter: 20/4241  total_loss: 62.53  loss_cls_b1: 12.16  loss_cls_b2: 12.29  loss_cls_b3: 12.19  loss_cls_b4: 12.08  loss_cls_attn: 12.5  loss_triplet_b1: 0.3374  loss_triplet_b2: 0.3352  loss_triplet_b3: 0.3513  loss_triplet_b4: 0.3667  time: 0.4835  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:25:23] fastreid.utils.events INFO:  eta: 1:02:26  epoch/iter: 21/4399  total_loss: 61.67  loss_cls_b1: 11.92  loss_cls_b2: 11.85  loss_cls_b3: 12.17  loss_cls_b4: 11.99  loss_cls_attn: 12.21  loss_triplet_b1: 0.3303  loss_triplet_b2: 0.3311  loss_triplet_b3: 0.3719  loss_triplet_b4: 0.3974  time: 0.4835  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:25:44] fastreid.utils.events INFO:  eta: 1:02:03  epoch/iter: 21/4443  total_loss: 62.59  loss_cls_b1: 12.03  loss_cls_b2: 12.04  loss_cls_b3: 12.24  loss_cls_b4: 12.39  loss_cls_attn: 12.36  loss_triplet_b1: 0.3832  loss_triplet_b2: 0.351  loss_triplet_b3: 0.3845  loss_triplet_b4: 0.4141  time: 0.4836  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:27:00] fastreid.utils.events INFO:  eta: 1:00:39  epoch/iter: 22/4599  total_loss: 61.31  loss_cls_b1: 11.72  loss_cls_b2: 11.97  loss_cls_b3: 12.07  loss_cls_b4: 12.03  loss_cls_attn: 12.25  loss_triplet_b1: 0.3838  loss_triplet_b2: 0.3751  loss_triplet_b3: 0.3896  loss_triplet_b4: 0.4103  time: 0.4836  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:27:22] fastreid.utils.events INFO:  eta: 1:00:17  epoch/iter: 22/4645  total_loss: 61.26  loss_cls_b1: 11.74  loss_cls_b2: 11.81  loss_cls_b3: 12.07  loss_cls_b4: 11.98  loss_cls_attn: 12.23  loss_triplet_b1: 0.3744  loss_triplet_b2: 0.3565  loss_triplet_b3: 0.3881  loss_triplet_b4: 0.4049  time: 0.4836  data_time: 0.0006  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:28:37] fastreid.utils.events INFO:  eta: 0:58:59  epoch/iter: 23/4799  total_loss: 59.39  loss_cls_b1: 11.39  loss_cls_b2: 11.28  loss_cls_b3: 11.5  loss_cls_b4: 11.55  loss_cls_attn: 11.82  loss_triplet_b1: 0.3343  loss_triplet_b2: 0.3311  loss_triplet_b3: 0.3616  loss_triplet_b4: 0.3673  time: 0.4837  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:29:00] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 21:29:00] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 21:29:00] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 21:29:04] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2658 s / batch. ETA=0:01:20
+[11/01 21:29:34] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2675 s / batch. ETA=0:00:48
+[11/01 21:30:04] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2676 s / batch. ETA=0:00:18
+[11/01 21:30:22] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.680261 (0.268284 s / batch per device, on 1 devices)
+[11/01 21:30:22] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.266975 s / batch per device, on 1 devices)
+[11/01 21:30:26] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 21:30:26] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 92.93    | 97.42    | 98.16     | 82.91 | 53.06  | 87.92    |[0m
+[11/01 21:30:26] fastreid.utils.events INFO:  eta: 0:58:34  epoch/iter: 23/4847  total_loss: 57.9  loss_cls_b1: 11.24  loss_cls_b2: 11.16  loss_cls_b3: 11.35  loss_cls_b4: 11.45  loss_cls_attn: 11.77  loss_triplet_b1: 0.3408  loss_triplet_b2: 0.3283  loss_triplet_b3: 0.331  loss_triplet_b4: 0.3551  time: 0.4837  data_time: 0.0006  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:31:40] fastreid.utils.events INFO:  eta: 0:57:25  epoch/iter: 24/4999  total_loss: 55.17  loss_cls_b1: 10.69  loss_cls_b2: 10.45  loss_cls_b3: 10.74  loss_cls_b4: 10.84  loss_cls_attn: 11.06  loss_triplet_b1: 0.27  loss_triplet_b2: 0.2611  loss_triplet_b3: 0.2868  loss_triplet_b4: 0.3173  time: 0.4837  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:32:04] fastreid.utils.events INFO:  eta: 0:57:03  epoch/iter: 24/5049  total_loss: 55.68  loss_cls_b1: 10.74  loss_cls_b2: 10.59  loss_cls_b3: 10.77  loss_cls_b4: 10.91  loss_cls_attn: 11.17  loss_triplet_b1: 0.2555  loss_triplet_b2: 0.2493  loss_triplet_b3: 0.283  loss_triplet_b4: 0.2864  time: 0.4837  data_time: 0.0006  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:33:17] fastreid.utils.events INFO:  eta: 0:55:48  epoch/iter: 25/5199  total_loss: 57.12  loss_cls_b1: 11.07  loss_cls_b2: 11.02  loss_cls_b3: 11.15  loss_cls_b4: 11.01  loss_cls_attn: 11.53  loss_triplet_b1: 0.2586  loss_triplet_b2: 0.2537  loss_triplet_b3: 0.2957  loss_triplet_b4: 0.3038  time: 0.4838  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:33:42] fastreid.utils.events INFO:  eta: 0:55:23  epoch/iter: 25/5251  total_loss: 56.37  loss_cls_b1: 10.76  loss_cls_b2: 10.82  loss_cls_b3: 10.96  loss_cls_b4: 10.93  loss_cls_attn: 11.27  loss_triplet_b1: 0.2724  loss_triplet_b2: 0.2776  loss_triplet_b3: 0.2997  loss_triplet_b4: 0.3462  time: 0.4838  data_time: 0.0007  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:34:54] fastreid.utils.events INFO:  eta: 0:54:11  epoch/iter: 26/5399  total_loss: 53.52  loss_cls_b1: 10.46  loss_cls_b2: 10.31  loss_cls_b3: 10.38  loss_cls_b4: 10.41  loss_cls_attn: 10.77  loss_triplet_b1: 0.2828  loss_triplet_b2: 0.2789  loss_triplet_b3: 0.2863  loss_triplet_b4: 0.3425  time: 0.4838  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:35:20] fastreid.utils.events INFO:  eta: 0:53:44  epoch/iter: 26/5453  total_loss: 52.88  loss_cls_b1: 10.35  loss_cls_b2: 10.2  loss_cls_b3: 10.22  loss_cls_b4: 10.37  loss_cls_attn: 10.75  loss_triplet_b1: 0.2529  loss_triplet_b2: 0.2544  loss_triplet_b3: 0.2789  loss_triplet_b4: 0.3316  time: 0.4838  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:36:31] fastreid.utils.events INFO:  eta: 0:52:33  epoch/iter: 27/5599  total_loss: 52.99  loss_cls_b1: 10.15  loss_cls_b2: 10.21  loss_cls_b3: 10.38  loss_cls_b4: 10.28  loss_cls_attn: 10.78  loss_triplet_b1: 0.2483  loss_triplet_b2: 0.2549  loss_triplet_b3: 0.2877  loss_triplet_b4: 0.3035  time: 0.4838  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:36:58] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 21:36:58] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 21:36:58] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 21:37:02] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2656 s / batch. ETA=0:01:20
+[11/01 21:37:32] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2674 s / batch. ETA=0:00:48
+[11/01 21:38:02] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2676 s / batch. ETA=0:00:18
+[11/01 21:38:20] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.684649 (0.268298 s / batch per device, on 1 devices)
+[11/01 21:38:20] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.266965 s / batch per device, on 1 devices)
+[11/01 21:38:24] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 21:38:24] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 93.68    | 97.48    | 98.63     | 84.10 | 55.56  | 88.89    |[0m
+[11/01 21:38:24] fastreid.utils.events INFO:  eta: 0:52:06  epoch/iter: 27/5655  total_loss: 51.43  loss_cls_b1: 9.845  loss_cls_b2: 9.877  loss_cls_b3: 9.975  loss_cls_b4: 10.04  loss_cls_attn: 10.46  loss_triplet_b1: 0.2524  loss_triplet_b2: 0.2634  loss_triplet_b3: 0.2698  loss_triplet_b4: 0.2889  time: 0.4838  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:39:34] fastreid.utils.events INFO:  eta: 0:50:56  epoch/iter: 28/5799  total_loss: 51.27  loss_cls_b1: 9.697  loss_cls_b2: 9.858  loss_cls_b3: 9.933  loss_cls_b4: 9.971  loss_cls_attn: 10.43  loss_triplet_b1: 0.2401  loss_triplet_b2: 0.2761  loss_triplet_b3: 0.2589  loss_triplet_b4: 0.3069  time: 0.4838  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:40:02] fastreid.utils.events INFO:  eta: 0:50:28  epoch/iter: 28/5857  total_loss: 51.59  loss_cls_b1: 9.661  loss_cls_b2: 9.778  loss_cls_b3: 10.04  loss_cls_b4: 10.02  loss_cls_attn: 10.44  loss_triplet_b1: 0.2587  loss_triplet_b2: 0.2885  loss_triplet_b3: 0.2916  loss_triplet_b4: 0.3435  time: 0.4838  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:41:12] fastreid.utils.events INFO:  eta: 0:49:21  epoch/iter: 29/5999  total_loss: 49.55  loss_cls_b1: 9.467  loss_cls_b2: 9.498  loss_cls_b3: 9.565  loss_cls_b4: 9.638  loss_cls_attn: 9.973  loss_triplet_b1: 0.2636  loss_triplet_b2: 0.2596  loss_triplet_b3: 0.3  loss_triplet_b4: 0.333  time: 0.4840  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:41:41] fastreid.utils.events INFO:  eta: 0:48:53  epoch/iter: 29/6059  total_loss: 49.83  loss_cls_b1: 9.553  loss_cls_b2: 9.524  loss_cls_b3: 9.582  loss_cls_b4: 9.63  loss_cls_attn: 10.11  loss_triplet_b1: 0.2353  loss_triplet_b2: 0.2397  loss_triplet_b3: 0.2802  loss_triplet_b4: 0.2867  time: 0.4840  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:42:50] fastreid.utils.events INFO:  eta: 0:47:54  epoch/iter: 30/6199  total_loss: 50  loss_cls_b1: 9.749  loss_cls_b2: 9.71  loss_cls_b3: 9.645  loss_cls_b4: 9.769  loss_cls_attn: 10.3  loss_triplet_b1: 0.2052  loss_triplet_b2: 0.2312  loss_triplet_b3: 0.2346  loss_triplet_b4: 0.227  time: 0.4842  data_time: 0.0005  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:43:20] fastreid.utils.events INFO:  eta: 0:47:28  epoch/iter: 30/6261  total_loss: 49.67  loss_cls_b1: 9.589  loss_cls_b2: 9.64  loss_cls_b3: 9.57  loss_cls_b4: 9.705  loss_cls_attn: 10.07  loss_triplet_b1: 0.2404  loss_triplet_b2: 0.2323  loss_triplet_b3: 0.2567  loss_triplet_b4: 0.2551  time: 0.4842  data_time: 0.0004  lr: 3.49e-04  max_mem: 16994M
+[11/01 21:44:28] fastreid.utils.events INFO:  eta: 0:46:32  epoch/iter: 31/6399  total_loss: 48.72  loss_cls_b1: 9.407  loss_cls_b2: 9.202  loss_cls_b3: 9.402  loss_cls_b4: 9.526  loss_cls_attn: 9.867  loss_triplet_b1: 0.2348  loss_triplet_b2: 0.22  loss_triplet_b3: 0.2505  loss_triplet_b4: 0.2677  time: 0.4843  data_time: 0.0005  lr: 3.48e-04  max_mem: 16994M
+[11/01 21:44:59] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 21:44:59] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 21:44:59] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 21:45:03] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2656 s / batch. ETA=0:01:21
+[11/01 21:45:33] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2675 s / batch. ETA=0:00:48
+[11/01 21:46:03] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2676 s / batch. ETA=0:00:18
+[11/01 21:46:21] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.702639 (0.268359 s / batch per device, on 1 devices)
+[11/01 21:46:21] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.266974 s / batch per device, on 1 devices)
+[11/01 21:46:25] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 21:46:25] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 93.82    | 97.83    | 98.87     | 85.45 | 58.44  | 89.64    |[0m
+[11/01 21:46:25] fastreid.utils.events INFO:  eta: 0:46:04  epoch/iter: 31/6463  total_loss: 47.58  loss_cls_b1: 9.238  loss_cls_b2: 8.962  loss_cls_b3: 9.264  loss_cls_b4: 9.28  loss_cls_attn: 9.713  loss_triplet_b1: 0.2105  loss_triplet_b2: 0.2093  loss_triplet_b3: 0.2082  loss_triplet_b4: 0.2347  time: 0.4844  data_time: 0.0004  lr: 3.48e-04  max_mem: 16994M
+[11/01 21:47:32] fastreid.utils.events INFO:  eta: 0:45:01  epoch/iter: 32/6599  total_loss: 45.18  loss_cls_b1: 8.71  loss_cls_b2: 8.613  loss_cls_b3: 8.741  loss_cls_b4: 8.822  loss_cls_attn: 9.236  loss_triplet_b1: 0.1968  loss_triplet_b2: 0.173  loss_triplet_b3: 0.1992  loss_triplet_b4: 0.2244  time: 0.4845  data_time: 0.0005  lr: 3.45e-04  max_mem: 16994M
+[11/01 21:48:04] fastreid.utils.events INFO:  eta: 0:44:29  epoch/iter: 32/6665  total_loss: 44.32  loss_cls_b1: 8.518  loss_cls_b2: 8.496  loss_cls_b3: 8.527  loss_cls_b4: 8.653  loss_cls_attn: 9.077  loss_triplet_b1: 0.1955  loss_triplet_b2: 0.1706  loss_triplet_b3: 0.1891  loss_triplet_b4: 0.2176  time: 0.4845  data_time: 0.0004  lr: 3.45e-04  max_mem: 16994M
+[11/01 21:49:09] fastreid.utils.events INFO:  eta: 0:43:24  epoch/iter: 33/6799  total_loss: 45.77  loss_cls_b1: 8.722  loss_cls_b2: 8.645  loss_cls_b3: 8.827  loss_cls_b4: 8.868  loss_cls_attn: 9.338  loss_triplet_b1: 0.1999  loss_triplet_b2: 0.1958  loss_triplet_b3: 0.2131  loss_triplet_b4: 0.2365  time: 0.4846  data_time: 0.0005  lr: 3.40e-04  max_mem: 16994M
+[11/01 21:49:42] fastreid.utils.events INFO:  eta: 0:42:51  epoch/iter: 33/6867  total_loss: 45.97  loss_cls_b1: 8.916  loss_cls_b2: 8.638  loss_cls_b3: 8.818  loss_cls_b4: 8.952  loss_cls_attn: 9.408  loss_triplet_b1: 0.2031  loss_triplet_b2: 0.2063  loss_triplet_b3: 0.2296  loss_triplet_b4: 0.2483  time: 0.4846  data_time: 0.0004  lr: 3.40e-04  max_mem: 16994M
+[11/01 21:50:47] fastreid.utils.events INFO:  eta: 0:41:45  epoch/iter: 34/6999  total_loss: 44.63  loss_cls_b1: 8.499  loss_cls_b2: 8.391  loss_cls_b3: 8.62  loss_cls_b4: 8.67  loss_cls_attn: 9.135  loss_triplet_b1: 0.1921  loss_triplet_b2: 0.1817  loss_triplet_b3: 0.205  loss_triplet_b4: 0.2242  time: 0.4846  data_time: 0.0005  lr: 3.34e-04  max_mem: 16994M
+[11/01 21:51:21] fastreid.utils.events INFO:  eta: 0:41:09  epoch/iter: 34/7069  total_loss: 43.38  loss_cls_b1: 8.242  loss_cls_b2: 8.161  loss_cls_b3: 8.32  loss_cls_b4: 8.508  loss_cls_attn: 8.956  loss_triplet_b1: 0.1736  loss_triplet_b2: 0.1728  loss_triplet_b3: 0.1946  loss_triplet_b4: 0.2046  time: 0.4846  data_time: 0.0004  lr: 3.34e-04  max_mem: 16994M
+[11/01 21:52:24] fastreid.utils.events INFO:  eta: 0:40:04  epoch/iter: 35/7199  total_loss: 42.23  loss_cls_b1: 8.216  loss_cls_b2: 7.955  loss_cls_b3: 8.123  loss_cls_b4: 8.3  loss_cls_attn: 8.823  loss_triplet_b1: 0.1617  loss_triplet_b2: 0.1527  loss_triplet_b3: 0.1667  loss_triplet_b4: 0.1729  time: 0.4847  data_time: 0.0005  lr: 3.25e-04  max_mem: 16994M
+[11/01 21:52:59] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 21:52:59] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 21:52:59] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 21:53:03] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2656 s / batch. ETA=0:01:21
+[11/01 21:53:33] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2675 s / batch. ETA=0:00:48
+[11/01 21:54:03] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2676 s / batch. ETA=0:00:18
+[11/01 21:54:21] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.709081 (0.268381 s / batch per device, on 1 devices)
+[11/01 21:54:21] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.266958 s / batch per device, on 1 devices)
+[11/01 21:54:25] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 21:54:25] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 94.18    | 98.31    | 98.87     | 86.75 | 61.26  | 90.47    |[0m
+[11/01 21:54:25] fastreid.utils.events INFO:  eta: 0:39:26  epoch/iter: 35/7271  total_loss: 41.52  loss_cls_b1: 8.007  loss_cls_b2: 7.938  loss_cls_b3: 8.022  loss_cls_b4: 8.186  loss_cls_attn: 8.628  loss_triplet_b1: 0.1518  loss_triplet_b2: 0.149  loss_triplet_b3: 0.154  loss_triplet_b4: 0.1709  time: 0.4847  data_time: 0.0004  lr: 3.25e-04  max_mem: 16994M
+[11/01 21:55:28] fastreid.utils.events INFO:  eta: 0:38:18  epoch/iter: 36/7399  total_loss: 41.47  loss_cls_b1: 7.919  loss_cls_b2: 7.898  loss_cls_b3: 8.015  loss_cls_b4: 8.087  loss_cls_attn: 8.646  loss_triplet_b1: 0.1488  loss_triplet_b2: 0.1627  loss_triplet_b3: 0.1692  loss_triplet_b4: 0.1872  time: 0.4847  data_time: 0.0005  lr: 3.15e-04  max_mem: 16994M
+[11/01 21:56:03] fastreid.utils.events INFO:  eta: 0:37:40  epoch/iter: 36/7473  total_loss: 40.95  loss_cls_b1: 7.823  loss_cls_b2: 7.803  loss_cls_b3: 7.882  loss_cls_b4: 8.066  loss_cls_attn: 8.615  loss_triplet_b1: 0.1448  loss_triplet_b2: 0.1537  loss_triplet_b3: 0.1648  loss_triplet_b4: 0.1738  time: 0.4847  data_time: 0.0004  lr: 3.15e-04  max_mem: 16994M
+[11/01 21:57:05] fastreid.utils.events INFO:  eta: 0:36:37  epoch/iter: 37/7599  total_loss: 39.23  loss_cls_b1: 7.464  loss_cls_b2: 7.226  loss_cls_b3: 7.528  loss_cls_b4: 7.817  loss_cls_attn: 8.311  loss_triplet_b1: 0.1265  loss_triplet_b2: 0.1302  loss_triplet_b3: 0.1526  loss_triplet_b4: 0.1493  time: 0.4847  data_time: 0.0005  lr: 3.04e-04  max_mem: 16994M
+[11/01 21:57:42] fastreid.utils.events INFO:  eta: 0:36:00  epoch/iter: 37/7675  total_loss: 38.53  loss_cls_b1: 7.455  loss_cls_b2: 7.122  loss_cls_b3: 7.514  loss_cls_b4: 7.625  loss_cls_attn: 8.156  loss_triplet_b1: 0.1411  loss_triplet_b2: 0.136  loss_triplet_b3: 0.1655  loss_triplet_b4: 0.165  time: 0.4848  data_time: 0.0005  lr: 3.04e-04  max_mem: 16994M
+[11/01 21:58:43] fastreid.utils.events INFO:  eta: 0:35:01  epoch/iter: 38/7799  total_loss: 39.43  loss_cls_b1: 7.357  loss_cls_b2: 7.314  loss_cls_b3: 7.491  loss_cls_b4: 7.617  loss_cls_attn: 8.165  loss_triplet_b1: 0.1503  loss_triplet_b2: 0.1461  loss_triplet_b3: 0.1577  loss_triplet_b4: 0.1802  time: 0.4849  data_time: 0.0005  lr: 2.91e-04  max_mem: 16994M
+[11/01 21:59:21] fastreid.utils.events INFO:  eta: 0:34:25  epoch/iter: 38/7877  total_loss: 36.72  loss_cls_b1: 7.05  loss_cls_b2: 7.056  loss_cls_b3: 7.104  loss_cls_b4: 7.207  loss_cls_attn: 7.68  loss_triplet_b1: 0.121  loss_triplet_b2: 0.1011  loss_triplet_b3: 0.1234  loss_triplet_b4: 0.1389  time: 0.4849  data_time: 0.0005  lr: 2.91e-04  max_mem: 16994M
+[11/01 22:00:21] fastreid.utils.events INFO:  eta: 0:33:32  epoch/iter: 39/7999  total_loss: 36.05  loss_cls_b1: 6.715  loss_cls_b2: 6.716  loss_cls_b3: 6.784  loss_cls_b4: 7.059  loss_cls_attn: 7.576  loss_triplet_b1: 0.1014  loss_triplet_b2: 0.08569  loss_triplet_b3: 0.1029  loss_triplet_b4: 0.1213  time: 0.4851  data_time: 0.0007  lr: 2.77e-04  max_mem: 16994M
+[11/01 22:01:00] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 22:01:01] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 22:01:01] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 22:01:04] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2657 s / batch. ETA=0:01:20
+[11/01 22:01:34] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2675 s / batch. ETA=0:00:48
+[11/01 22:02:04] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2676 s / batch. ETA=0:00:18
+[11/01 22:02:22] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.701501 (0.268355 s / batch per device, on 1 devices)
+[11/01 22:02:22] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.266976 s / batch per device, on 1 devices)
+[11/01 22:02:27] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 22:02:27] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 94.60    | 98.28    | 99.02     | 87.31 | 62.30  | 90.96    |[0m
+[11/01 22:02:27] fastreid.utils.checkpoint INFO: Saving checkpoint to logs/MarketT_Quick/STAGE/SBaseline/model_best.pth
+[11/01 22:02:29] fastreid.utils.checkpoint INFO: Saving checkpoint to logs/MarketT_Quick/STAGE/SBaseline/model_0039.pth
+[11/01 22:02:32] fastreid.utils.events INFO:  eta: 0:32:55  epoch/iter: 39/8079  total_loss: 35.3  loss_cls_b1: 6.705  loss_cls_b2: 6.678  loss_cls_b3: 6.733  loss_cls_b4: 7.054  loss_cls_attn: 7.552  loss_triplet_b1: 0.1138  loss_triplet_b2: 0.1207  loss_triplet_b3: 0.1152  loss_triplet_b4: 0.1389  time: 0.4851  data_time: 0.0005  lr: 2.77e-04  max_mem: 16994M
+[11/01 22:03:31] fastreid.utils.events INFO:  eta: 0:31:56  epoch/iter: 40/8199  total_loss: 34.69  loss_cls_b1: 6.41  loss_cls_b2: 6.412  loss_cls_b3: 6.592  loss_cls_b4: 6.868  loss_cls_attn: 7.421  loss_triplet_b1: 0.116  loss_triplet_b2: 0.1233  loss_triplet_b3: 0.1411  loss_triplet_b4: 0.1422  time: 0.4852  data_time: 0.0006  lr: 2.62e-04  max_mem: 16994M
+[11/01 22:04:11] fastreid.utils.events INFO:  eta: 0:31:18  epoch/iter: 40/8281  total_loss: 34.46  loss_cls_b1: 6.412  loss_cls_b2: 6.426  loss_cls_b3: 6.618  loss_cls_b4: 6.805  loss_cls_attn: 7.415  loss_triplet_b1: 0.09847  loss_triplet_b2: 0.109  loss_triplet_b3: 0.1279  loss_triplet_b4: 0.1313  time: 0.4853  data_time: 0.0005  lr: 2.62e-04  max_mem: 16994M
+[11/01 22:05:08] fastreid.utils.events INFO:  eta: 0:30:21  epoch/iter: 41/8399  total_loss: 32.48  loss_cls_b1: 6.08  loss_cls_b2: 6.079  loss_cls_b3: 6.211  loss_cls_b4: 6.38  loss_cls_attn: 6.934  loss_triplet_b1: 0.08736  loss_triplet_b2: 0.1032  loss_triplet_b3: 0.1176  loss_triplet_b4: 0.1148  time: 0.4853  data_time: 0.0004  lr: 2.45e-04  max_mem: 16994M
+[11/01 22:05:49] fastreid.utils.events INFO:  eta: 0:29:40  epoch/iter: 41/8483  total_loss: 32.5  loss_cls_b1: 6.11  loss_cls_b2: 5.992  loss_cls_b3: 6.168  loss_cls_b4: 6.364  loss_cls_attn: 7.048  loss_triplet_b1: 0.09373  loss_triplet_b2: 0.09993  loss_triplet_b3: 0.1204  loss_triplet_b4: 0.1181  time: 0.4853  data_time: 0.0005  lr: 2.45e-04  max_mem: 16994M
+[11/01 22:06:45] fastreid.utils.events INFO:  eta: 0:28:43  epoch/iter: 42/8599  total_loss: 32.06  loss_cls_b1: 5.972  loss_cls_b2: 5.897  loss_cls_b3: 6.068  loss_cls_b4: 6.266  loss_cls_attn: 6.874  loss_triplet_b1: 0.08709  loss_triplet_b2: 0.09093  loss_triplet_b3: 0.1021  loss_triplet_b4: 0.1206  time: 0.4852  data_time: 0.0004  lr: 2.28e-04  max_mem: 16994M
+[11/01 22:07:27] fastreid.utils.events INFO:  eta: 0:28:00  epoch/iter: 42/8685  total_loss: 30.07  loss_cls_b1: 5.752  loss_cls_b2: 5.668  loss_cls_b3: 5.745  loss_cls_b4: 6.018  loss_cls_attn: 6.673  loss_triplet_b1: 0.07836  loss_triplet_b2: 0.08042  loss_triplet_b3: 0.09666  loss_triplet_b4: 0.1126  time: 0.4853  data_time: 0.0005  lr: 2.28e-04  max_mem: 16994M
+[11/01 22:08:22] fastreid.utils.events INFO:  eta: 0:27:02  epoch/iter: 43/8799  total_loss: 29.78  loss_cls_b1: 5.604  loss_cls_b2: 5.501  loss_cls_b3: 5.652  loss_cls_b4: 5.867  loss_cls_attn: 6.441  loss_triplet_b1: 0.0818  loss_triplet_b2: 0.08345  loss_triplet_b3: 0.08846  loss_triplet_b4: 0.109  time: 0.4853  data_time: 0.0004  lr: 2.11e-04  max_mem: 16994M
+[11/01 22:09:05] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 22:09:05] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 22:09:05] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 22:09:09] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2675 s / batch. ETA=0:01:18
+[11/01 22:09:39] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2677 s / batch. ETA=0:00:48
+[11/01 22:10:09] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2677 s / batch. ETA=0:00:18
+[11/01 22:10:27] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.661660 (0.268221 s / batch per device, on 1 devices)
+[11/01 22:10:27] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.267037 s / batch per device, on 1 devices)
+[11/01 22:10:31] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 22:10:31] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 95.04    | 98.49    | 98.96     | 88.61 | 66.18  | 91.83    |[0m
+[11/01 22:10:31] fastreid.utils.events INFO:  eta: 0:26:18  epoch/iter: 43/8887  total_loss: 29.55  loss_cls_b1: 5.486  loss_cls_b2: 5.504  loss_cls_b3: 5.584  loss_cls_b4: 5.666  loss_cls_attn: 6.264  loss_triplet_b1: 0.08241  loss_triplet_b2: 0.08287  loss_triplet_b3: 0.08366  loss_triplet_b4: 0.1038  time: 0.4853  data_time: 0.0006  lr: 2.11e-04  max_mem: 16994M
+[11/01 22:11:26] fastreid.utils.events INFO:  eta: 0:25:21  epoch/iter: 44/8999  total_loss: 29.02  loss_cls_b1: 5.367  loss_cls_b2: 5.456  loss_cls_b3: 5.545  loss_cls_b4: 5.675  loss_cls_attn: 6.268  loss_triplet_b1: 0.08969  loss_triplet_b2: 0.08817  loss_triplet_b3: 0.1007  loss_triplet_b4: 0.1095  time: 0.4853  data_time: 0.0004  lr: 1.93e-04  max_mem: 16994M
+[11/01 22:12:10] fastreid.utils.events INFO:  eta: 0:24:36  epoch/iter: 44/9089  total_loss: 28.61  loss_cls_b1: 5.194  loss_cls_b2: 5.168  loss_cls_b3: 5.354  loss_cls_b4: 5.6  loss_cls_attn: 6.232  loss_triplet_b1: 0.08228  loss_triplet_b2: 0.08289  loss_triplet_b3: 0.09218  loss_triplet_b4: 0.09942  time: 0.4853  data_time: 0.0005  lr: 1.93e-04  max_mem: 16994M
+[11/01 22:13:03] fastreid.utils.events INFO:  eta: 0:23:40  epoch/iter: 45/9199  total_loss: 25.73  loss_cls_b1: 4.834  loss_cls_b2: 4.839  loss_cls_b3: 4.926  loss_cls_b4: 5.17  loss_cls_attn: 5.84  loss_triplet_b1: 0.06742  loss_triplet_b2: 0.06758  loss_triplet_b3: 0.07518  loss_triplet_b4: 0.083  time: 0.4853  data_time: 0.0004  lr: 1.75e-04  max_mem: 16994M
+[11/01 22:13:48] fastreid.utils.events INFO:  eta: 0:22:55  epoch/iter: 45/9291  total_loss: 25.91  loss_cls_b1: 4.808  loss_cls_b2: 4.917  loss_cls_b3: 4.942  loss_cls_b4: 5.191  loss_cls_attn: 5.895  loss_triplet_b1: 0.06408  loss_triplet_b2: 0.06415  loss_triplet_b3: 0.07686  loss_triplet_b4: 0.08093  time: 0.4853  data_time: 0.0005  lr: 1.75e-04  max_mem: 16994M
+[11/01 22:14:40] fastreid.utils.events INFO:  eta: 0:22:01  epoch/iter: 46/9399  total_loss: 25.25  loss_cls_b1: 4.675  loss_cls_b2: 4.697  loss_cls_b3: 4.815  loss_cls_b4: 4.945  loss_cls_attn: 5.607  loss_triplet_b1: 0.05425  loss_triplet_b2: 0.05266  loss_triplet_b3: 0.06262  loss_triplet_b4: 0.06898  time: 0.4853  data_time: 0.0004  lr: 1.56e-04  max_mem: 16994M
+[11/01 22:15:26] fastreid.utils.events INFO:  eta: 0:21:15  epoch/iter: 46/9493  total_loss: 24.09  loss_cls_b1: 4.49  loss_cls_b2: 4.543  loss_cls_b3: 4.593  loss_cls_b4: 4.835  loss_cls_attn: 5.419  loss_triplet_b1: 0.05395  loss_triplet_b2: 0.06048  loss_triplet_b3: 0.06735  loss_triplet_b4: 0.07602  time: 0.4853  data_time: 0.0006  lr: 1.56e-04  max_mem: 16994M
+[11/01 22:16:18] fastreid.utils.events INFO:  eta: 0:20:25  epoch/iter: 47/9599  total_loss: 23.53  loss_cls_b1: 4.394  loss_cls_b2: 4.384  loss_cls_b3: 4.525  loss_cls_b4: 4.679  loss_cls_attn: 5.339  loss_triplet_b1: 0.06165  loss_triplet_b2: 0.07801  loss_triplet_b3: 0.07591  loss_triplet_b4: 0.08889  time: 0.4854  data_time: 0.0004  lr: 1.38e-04  max_mem: 16994M
+[11/01 22:17:04] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 22:17:05] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 22:17:05] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 22:17:08] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2659 s / batch. ETA=0:01:20
+[11/01 22:17:38] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2676 s / batch. ETA=0:00:48
+[11/01 22:18:08] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2676 s / batch. ETA=0:00:18
+[11/01 22:18:26] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.692068 (0.268323 s / batch per device, on 1 devices)
+[11/01 22:18:26] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.266973 s / batch per device, on 1 devices)
+[11/01 22:18:30] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 22:18:30] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 95.55    | 98.49    | 99.05     | 89.54 | 68.87  | 92.54    |[0m
+[11/01 22:18:31] fastreid.utils.events INFO:  eta: 0:19:38  epoch/iter: 47/9695  total_loss: 23.46  loss_cls_b1: 4.382  loss_cls_b2: 4.395  loss_cls_b3: 4.494  loss_cls_b4: 4.659  loss_cls_attn: 5.256  loss_triplet_b1: 0.05682  loss_triplet_b2: 0.05619  loss_triplet_b3: 0.06795  loss_triplet_b4: 0.07436  time: 0.4854  data_time: 0.0006  lr: 1.38e-04  max_mem: 16994M
+[11/01 22:19:22] fastreid.utils.events INFO:  eta: 0:18:48  epoch/iter: 48/9799  total_loss: 22.76  loss_cls_b1: 4.137  loss_cls_b2: 4.196  loss_cls_b3: 4.361  loss_cls_b4: 4.577  loss_cls_attn: 5.176  loss_triplet_b1: 0.05392  loss_triplet_b2: 0.04736  loss_triplet_b3: 0.05926  loss_triplet_b4: 0.06343  time: 0.4854  data_time: 0.0004  lr: 1.21e-04  max_mem: 16994M
+[11/01 22:20:09] fastreid.utils.events INFO:  eta: 0:18:00  epoch/iter: 48/9897  total_loss: 21.96  loss_cls_b1: 4.036  loss_cls_b2: 4.043  loss_cls_b3: 4.252  loss_cls_b4: 4.37  loss_cls_attn: 4.989  loss_triplet_b1: 0.05396  loss_triplet_b2: 0.05017  loss_triplet_b3: 0.06209  loss_triplet_b4: 0.06539  time: 0.4854  data_time: 0.0007  lr: 1.21e-04  max_mem: 16994M
+[11/01 22:20:59] fastreid.utils.events INFO:  eta: 0:17:10  epoch/iter: 49/9999  total_loss: 21.01  loss_cls_b1: 3.942  loss_cls_b2: 3.879  loss_cls_b3: 4.136  loss_cls_b4: 4.126  loss_cls_attn: 4.768  loss_triplet_b1: 0.05747  loss_triplet_b2: 0.05267  loss_triplet_b3: 0.06219  loss_triplet_b4: 0.06739  time: 0.4854  data_time: 0.0005  lr: 1.04e-04  max_mem: 16994M
+[11/01 22:21:48] fastreid.utils.events INFO:  eta: 0:16:22  epoch/iter: 49/10099  total_loss: 20.55  loss_cls_b1: 3.846  loss_cls_b2: 3.793  loss_cls_b3: 4.012  loss_cls_b4: 4.063  loss_cls_attn: 4.684  loss_triplet_b1: 0.05774  loss_triplet_b2: 0.05565  loss_triplet_b3: 0.06529  loss_triplet_b4: 0.06702  time: 0.4855  data_time: 0.0007  lr: 1.04e-04  max_mem: 16994M
+[11/01 22:22:37] fastreid.utils.events INFO:  eta: 0:15:34  epoch/iter: 50/10199  total_loss: 20.2  loss_cls_b1: 3.688  loss_cls_b2: 3.709  loss_cls_b3: 3.902  loss_cls_b4: 3.988  loss_cls_attn: 4.647  loss_triplet_b1: 0.04979  loss_triplet_b2: 0.05554  loss_triplet_b3: 0.054  loss_triplet_b4: 0.05815  time: 0.4855  data_time: 0.0005  lr: 8.77e-05  max_mem: 16994M
+[11/01 22:23:27] fastreid.utils.events INFO:  eta: 0:14:45  epoch/iter: 50/10301  total_loss: 20.32  loss_cls_b1: 3.682  loss_cls_b2: 3.756  loss_cls_b3: 3.897  loss_cls_b4: 3.992  loss_cls_attn: 4.627  loss_triplet_b1: 0.04329  loss_triplet_b2: 0.04352  loss_triplet_b3: 0.04292  loss_triplet_b4: 0.05003  time: 0.4856  data_time: 0.0005  lr: 8.77e-05  max_mem: 16994M
+[11/01 22:24:15] fastreid.utils.events INFO:  eta: 0:14:00  epoch/iter: 51/10399  total_loss: 20.31  loss_cls_b1: 3.645  loss_cls_b2: 3.737  loss_cls_b3: 3.78  loss_cls_b4: 4.059  loss_cls_attn: 4.604  loss_triplet_b1: 0.04323  loss_triplet_b2: 0.04463  loss_triplet_b3: 0.04462  loss_triplet_b4: 0.051  time: 0.4856  data_time: 0.0006  lr: 7.24e-05  max_mem: 16994M
+[11/01 22:25:06] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 22:25:06] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 22:25:06] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 22:25:10] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2663 s / batch. ETA=0:01:19
+[11/01 22:25:40] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2678 s / batch. ETA=0:00:48
+[11/01 22:26:10] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2678 s / batch. ETA=0:00:18
+[11/01 22:26:28] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.749066 (0.268515 s / batch per device, on 1 devices)
+[11/01 22:26:28] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.267165 s / batch per device, on 1 devices)
+[11/01 22:26:32] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 22:26:32] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 95.64    | 98.66    | 99.26     | 90.43 | 70.91  | 93.03    |[0m
+[11/01 22:26:33] fastreid.utils.events INFO:  eta: 0:13:10  epoch/iter: 51/10503  total_loss: 19.53  loss_cls_b1: 3.566  loss_cls_b2: 3.568  loss_cls_b3: 3.715  loss_cls_b4: 3.911  loss_cls_attn: 4.563  loss_triplet_b1: 0.04356  loss_triplet_b2: 0.04527  loss_triplet_b3: 0.05342  loss_triplet_b4: 0.05701  time: 0.4857  data_time: 0.0005  lr: 7.24e-05  max_mem: 16994M
+[11/01 22:27:20] fastreid.utils.events INFO:  eta: 0:12:24  epoch/iter: 52/10599  total_loss: 18.37  loss_cls_b1: 3.332  loss_cls_b2: 3.339  loss_cls_b3: 3.541  loss_cls_b4: 3.676  loss_cls_attn: 4.274  loss_triplet_b1: 0.04546  loss_triplet_b2: 0.05095  loss_triplet_b3: 0.05513  loss_triplet_b4: 0.05701  time: 0.4857  data_time: 0.0006  lr: 5.83e-05  max_mem: 16994M
+[11/01 22:28:12] fastreid.utils.events INFO:  eta: 0:11:32  epoch/iter: 52/10705  total_loss: 17.94  loss_cls_b1: 3.319  loss_cls_b2: 3.255  loss_cls_b3: 3.461  loss_cls_b4: 3.585  loss_cls_attn: 4.099  loss_triplet_b1: 0.04462  loss_triplet_b2: 0.04784  loss_triplet_b3: 0.04847  loss_triplet_b4: 0.05413  time: 0.4857  data_time: 0.0006  lr: 5.83e-05  max_mem: 16994M
+[11/01 22:28:58] fastreid.utils.events INFO:  eta: 0:10:46  epoch/iter: 53/10799  total_loss: 17.9  loss_cls_b1: 3.257  loss_cls_b2: 3.231  loss_cls_b3: 3.368  loss_cls_b4: 3.574  loss_cls_attn: 4.114  loss_triplet_b1: 0.03938  loss_triplet_b2: 0.03384  loss_triplet_b3: 0.0478  loss_triplet_b4: 0.05215  time: 0.4858  data_time: 0.0005  lr: 4.54e-05  max_mem: 16994M
+[11/01 22:29:51] fastreid.utils.events INFO:  eta: 0:09:54  epoch/iter: 53/10907  total_loss: 17.45  loss_cls_b1: 3.099  loss_cls_b2: 3.119  loss_cls_b3: 3.268  loss_cls_b4: 3.491  loss_cls_attn: 4.058  loss_triplet_b1: 0.03951  loss_triplet_b2: 0.0366  loss_triplet_b3: 0.04882  loss_triplet_b4: 0.04817  time: 0.4858  data_time: 0.0004  lr: 4.54e-05  max_mem: 16994M
+[11/01 22:30:36] fastreid.utils.events INFO:  eta: 0:09:09  epoch/iter: 54/10999  total_loss: 17.15  loss_cls_b1: 3.085  loss_cls_b2: 3.208  loss_cls_b3: 3.234  loss_cls_b4: 3.489  loss_cls_attn: 4.013  loss_triplet_b1: 0.04123  loss_triplet_b2: 0.0407  loss_triplet_b3: 0.04905  loss_triplet_b4: 0.05188  time: 0.4859  data_time: 0.0006  lr: 3.39e-05  max_mem: 16994M
+[11/01 22:31:30] fastreid.utils.events INFO:  eta: 0:08:15  epoch/iter: 54/11109  total_loss: 17  loss_cls_b1: 3.118  loss_cls_b2: 3.077  loss_cls_b3: 3.23  loss_cls_b4: 3.411  loss_cls_attn: 4.006  loss_triplet_b1: 0.04323  loss_triplet_b2: 0.0416  loss_triplet_b3: 0.04775  loss_triplet_b4: 0.05475  time: 0.4859  data_time: 0.0004  lr: 3.39e-05  max_mem: 16994M
+[11/01 22:32:14] fastreid.utils.events INFO:  eta: 0:07:31  epoch/iter: 55/11199  total_loss: 17  loss_cls_b1: 3.063  loss_cls_b2: 3.007  loss_cls_b3: 3.243  loss_cls_b4: 3.399  loss_cls_attn: 3.977  loss_triplet_b1: 0.04337  loss_triplet_b2: 0.04398  loss_triplet_b3: 0.04826  loss_triplet_b4: 0.06038  time: 0.4860  data_time: 0.0006  lr: 2.40e-05  max_mem: 16994M
+[11/01 22:33:09] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 22:33:09] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 22:33:09] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 22:33:13] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2666 s / batch. ETA=0:01:20
+[11/01 22:33:43] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2677 s / batch. ETA=0:00:48
+[11/01 22:34:13] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2678 s / batch. ETA=0:00:18
+[11/01 22:34:31] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.732796 (0.268461 s / batch per device, on 1 devices)
+[11/01 22:34:31] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.267168 s / batch per device, on 1 devices)
+[11/01 22:34:35] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 22:34:35] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 95.96    | 98.72    | 99.26     | 90.88 | 72.56  | 93.42    |[0m
+[11/01 22:34:35] fastreid.utils.events INFO:  eta: 0:06:36  epoch/iter: 55/11311  total_loss: 16.85  loss_cls_b1: 2.987  loss_cls_b2: 3.007  loss_cls_b3: 3.184  loss_cls_b4: 3.377  loss_cls_attn: 3.927  loss_triplet_b1: 0.04188  loss_triplet_b2: 0.04376  loss_triplet_b3: 0.05402  loss_triplet_b4: 0.06075  time: 0.4860  data_time: 0.0005  lr: 2.40e-05  max_mem: 16994M
+[11/01 22:35:18] fastreid.utils.events INFO:  eta: 0:05:53  epoch/iter: 56/11399  total_loss: 16.4  loss_cls_b1: 2.934  loss_cls_b2: 3  loss_cls_b3: 3.084  loss_cls_b4: 3.297  loss_cls_attn: 3.87  loss_triplet_b1: 0.03623  loss_triplet_b2: 0.03749  loss_triplet_b3: 0.04281  loss_triplet_b4: 0.04673  time: 0.4860  data_time: 0.0006  lr: 1.57e-05  max_mem: 16994M
+[11/01 22:36:14] fastreid.utils.events INFO:  eta: 0:04:57  epoch/iter: 56/11513  total_loss: 16.37  loss_cls_b1: 2.899  loss_cls_b2: 2.972  loss_cls_b3: 3.092  loss_cls_b4: 3.292  loss_cls_attn: 3.806  loss_triplet_b1: 0.03703  loss_triplet_b2: 0.03852  loss_triplet_b3: 0.0418  loss_triplet_b4: 0.04637  time: 0.4861  data_time: 0.0005  lr: 1.57e-05  max_mem: 16994M
+[11/01 22:36:56] fastreid.utils.events INFO:  eta: 0:04:15  epoch/iter: 57/11599  total_loss: 16.51  loss_cls_b1: 2.941  loss_cls_b2: 2.962  loss_cls_b3: 3.159  loss_cls_b4: 3.292  loss_cls_attn: 3.8  loss_triplet_b1: 0.03785  loss_triplet_b2: 0.0408  loss_triplet_b3: 0.04205  loss_triplet_b4: 0.05539  time: 0.4861  data_time: 0.0006  lr: 9.21e-06  max_mem: 16994M
+[11/01 22:37:53] fastreid.utils.events INFO:  eta: 0:03:18  epoch/iter: 57/11715  total_loss: 16.26  loss_cls_b1: 2.906  loss_cls_b2: 2.926  loss_cls_b3: 3.106  loss_cls_b4: 3.265  loss_cls_attn: 3.777  loss_triplet_b1: 0.03913  loss_triplet_b2: 0.03848  loss_triplet_b3: 0.04994  loss_triplet_b4: 0.05765  time: 0.4861  data_time: 0.0004  lr: 9.21e-06  max_mem: 16994M
+[11/01 22:38:34] fastreid.utils.events INFO:  eta: 0:02:37  epoch/iter: 58/11799  total_loss: 15.82  loss_cls_b1: 2.805  loss_cls_b2: 2.852  loss_cls_b3: 2.984  loss_cls_b4: 3.198  loss_cls_attn: 3.728  loss_triplet_b1: 0.03445  loss_triplet_b2: 0.03418  loss_triplet_b3: 0.04758  loss_triplet_b4: 0.05769  time: 0.4862  data_time: 0.0006  lr: 4.50e-06  max_mem: 16994M
+[11/01 22:39:32] fastreid.utils.events INFO:  eta: 0:01:39  epoch/iter: 58/11917  total_loss: 16.09  loss_cls_b1: 2.816  loss_cls_b2: 2.849  loss_cls_b3: 3.02  loss_cls_b4: 3.198  loss_cls_attn: 3.804  loss_triplet_b1: 0.03535  loss_triplet_b2: 0.03428  loss_triplet_b3: 0.04162  loss_triplet_b4: 0.05427  time: 0.4862  data_time: 0.0004  lr: 4.50e-06  max_mem: 16994M
+[11/01 22:40:12] fastreid.utils.events INFO:  eta: 0:00:58  epoch/iter: 59/11999  total_loss: 15.9  loss_cls_b1: 2.796  loss_cls_b2: 2.863  loss_cls_b3: 3.062  loss_cls_b4: 3.26  loss_cls_attn: 3.798  loss_triplet_b1: 0.03535  loss_triplet_b2: 0.03354  loss_triplet_b3: 0.04202  loss_triplet_b4: 0.04805  time: 0.4862  data_time: 0.0005  lr: 1.65e-06  max_mem: 16994M
+[11/01 22:41:11] fastreid.utils.events INFO:  eta: 0:00:00  epoch/iter: 59/12119  total_loss: 15.67  loss_cls_b1: 2.762  loss_cls_b2: 2.808  loss_cls_b3: 3.003  loss_cls_b4: 3.141  loss_cls_attn: 3.657  loss_triplet_b1: 0.02943  loss_triplet_b2: 0.03206  loss_triplet_b3: 0.04116  loss_triplet_b4: 0.04229  time: 0.4862  data_time: 0.0005  lr: 1.65e-06  max_mem: 16994M
+[11/01 22:41:11] fastreid.engine.defaults INFO: Prepare testing set
+[11/01 22:41:11] fastreid.data.datasets.bases INFO: => Loaded Market1501 in csv format: 
+[36m| subset   | # ids   | # images   | # cameras   |
+|:---------|:--------|:-----------|:------------|
+| query    | 750     | 3368       | 6           |
+| gallery  | 751     | 15913      | 6           |[0m
+[11/01 22:41:11] fastreid.evaluation.evaluator INFO: Start inference on 19281 images
+[11/01 22:41:15] fastreid.evaluation.evaluator INFO: Inference done 11/302. 0.2665 s / batch. ETA=0:01:20
+[11/01 22:41:45] fastreid.evaluation.evaluator INFO: Inference done 123/302. 0.2676 s / batch. ETA=0:00:48
+[11/01 22:42:15] fastreid.evaluation.evaluator INFO: Inference done 235/302. 0.2677 s / batch. ETA=0:00:18
+[11/01 22:42:33] fastreid.evaluation.evaluator INFO: Total inference time: 0:01:19.737309 (0.268476 s / batch per device, on 1 devices)
+[11/01 22:42:33] fastreid.evaluation.evaluator INFO: Total inference pure compute time: 0:01:19 (0.267085 s / batch per device, on 1 devices)
+[11/01 22:42:37] fastreid.engine.defaults INFO: Evaluation results for Market1501 in csv format:
+[11/01 22:42:37] fastreid.evaluation.testing INFO: Evaluation results in csv format: 
+[36m| Dataset    | Rank-1   | Rank-5   | Rank-10   | mAP   | mINP   | metric   |
+|:-----------|:---------|:---------|:----------|:------|:-------|:---------|
+| Market1501 | 96.35    | 98.72    | 99.23     | 90.89 | 72.49  | 93.62    |[0m
+[11/01 22:42:38] fastreid.utils.checkpoint INFO: Saving checkpoint to logs/MarketT_Quick/STAGE/SBaseline/model_best.pth
+[11/01 22:42:40] fastreid.utils.checkpoint INFO: Saving checkpoint to logs/MarketT_Quick/STAGE/SBaseline/model_final.pth
+[11/01 22:42:43] fastreid.utils.events INFO:  eta: 0:00:00  epoch/iter: 59/12119  total_loss: 15.67  loss_cls_b1: 2.762  loss_cls_b2: 2.808  loss_cls_b3: 3.003  loss_cls_b4: 3.141  loss_cls_attn: 3.657  loss_triplet_b1: 0.02943  loss_triplet_b2: 0.03206  loss_triplet_b3: 0.04116  loss_triplet_b4: 0.04229  time: 0.4862  data_time: 0.0005  lr: 1.65e-06  max_mem: 16994M
+[11/01 22:42:43] fastreid.engine.hooks INFO: Overall training speed: 12118 iterations in 1:38:12 (0.4863 s / it)
+[11/01 22:42:43] fastreid.engine.hooks INFO: Total training time: 2:00:20 (0:22:08 on hooks)

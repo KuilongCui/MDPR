@@ -1,0 +1,10 @@
+# >>> from SoccerNet.Downloader import SoccerNetDownloader
+# >>> mySoccerNetDownloader = SoccerNetDownloader(LocalDirectory="./datasets/soccernetv3")
+# >>> mySoccerNetDownloader.downloadDataTask(task="reid", split=["train", "valid", "test", "challenge"])
+
+
+
+# 91.75 2 2 3 3  -> 4
+
+# NL
+# twobranch
