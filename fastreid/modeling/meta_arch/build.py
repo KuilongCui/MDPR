@@ -15,6 +15,10 @@ The registered object will be called with `obj(cfg)`
 and expected to return a `nn.Module` object.
 """
 
+def get_parameter_number(model):
+    total_num = sum(p.numel() for p in model.parameters())
+    trainable_num = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    return {'Total': total_num, 'Trainable': trainable_num}
 
 def build_model(cfg):
     """
@@ -23,5 +27,6 @@ def build_model(cfg):
     """
     meta_arch = cfg.MODEL.META_ARCHITECTURE
     model = META_ARCH_REGISTRY.get(meta_arch)(cfg)
+
     model.to(torch.device(cfg.MODEL.DEVICE))
     return model

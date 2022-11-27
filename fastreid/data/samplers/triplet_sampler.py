@@ -3,7 +3,7 @@
 @author:  liaoxingyu
 @contact: liaoxingyu2@jd.com
 """
-
+import torch
 import copy
 import itertools
 from collections import defaultdict
@@ -227,6 +227,8 @@ class NaiveIdentitySampler(Sampler):
             seed = comm.shared_random_seed()
         self._seed = int(seed)
 
+        self.valid_idxs = torch.arange(len(self.data_source))
+
     def __iter__(self):
         start = self._rank
         yield from itertools.islice(self._infinite_indices(), start, None, self._world_size)
@@ -258,3 +260,6 @@ class NaiveIdentitySampler(Sampler):
                 if len(batch_indices) == self.batch_size:
                     yield from reorder_index(batch_indices, self._world_size)
                     batch_indices = []
+
+    def set_valid_index(self, indexs):
+        self.valid_idxs = indexs

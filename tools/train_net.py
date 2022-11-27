@@ -8,7 +8,7 @@
 import sys
 sys.path.append('.')
 
-from fastreid.config import get_cfg
+from fastreid.config import get_cfg, add_mdpr_cfg
 from fastreid.engine import DefaultTrainer, default_argument_parser, default_setup, launch
 from fastreid.utils.checkpoint import Checkpointer
 
@@ -18,6 +18,7 @@ def setup(args):
     Create configs and perform basic setups.
     """
     cfg = get_cfg()
+    add_mdpr_cfg(cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.freeze()

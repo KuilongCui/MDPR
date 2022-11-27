@@ -1,0 +1,55 @@
+_BASE_: ../Base-SBS.yml
+
+DATASETS:
+  NAMES: ("Market1501",)
+  TESTS: ("Market1501",)
+
+OUTPUT_DIR: logs/MDPR/Market1501/
+
+MODEL:
+  META_ARCHITECTURE: MDPR
+
+  BACKBONE:
+    WITH_IBN: True
+    WITH_NL: False
+    DEPTH: 101x
+    PRETRAIN: True
+    LAST_STRIDE: 1
+    EMBEDDING_DIM: 512
+    PRETRAIN_PATH: './weights/lup_moco_r101.pth'
+
+  LOSSES:
+    NAME: ("CrossEntropyLoss", "TripletLoss")
+
+    TRI:
+      MARGIN: 0.05
+
+INPUT:
+  AUTOAUG:
+    ENABLED: False
+
+  RPT:
+    ENABLED: True
+
+  SIZE_TRAIN: [ 384, 192 ]
+
+  SIZE_TEST: [ 384, 192 ]
+
+SOLVER:
+  AMP:
+    ENABLED: True
+
+  IMS_PER_BATCH: 64
+  
+  DELAY_EPOCHS: 0
+  ETA_MIN_LR: 1.0e-07
+  FREEZE_ITERS: 0
+
+  CHECKPOINT_PERIOD: 60
+
+  MAX_EPOCH: 60
+  SCHED: CosineAnnealingLR
+
+TEST:
+  EVAL_PERIOD: 10
+  IMS_PER_BATCH: 128

@@ -1,7 +1,16 @@
-datasets/
+datasets/DukeMTMC-reID*
+datasets/synergyreid_data*
+datasets/Market*
+datasets/MSMT17*
+weights/*.pth
+logs/
+*backup/
 
-# weight file
-*.pth
+command.md
+nohup.out
+run.sh
+# log file
+*.events.*
 
 
 # compilation and distribution

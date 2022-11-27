@@ -82,13 +82,13 @@ class Visualizer:
                 if cmc[i] == 1:
                     label = 'true'
                     ax.add_patch(plt.Rectangle(xy=(0, 0), width=gallery_img.shape[1] - 1,
-                                               height=gallery_img.shape[0] - 1, edgecolor=(1, 0, 0),
+                                               height=gallery_img.shape[0] - 1, edgecolor=(0, 0, 1),
                                                fill=False, linewidth=5))
                 else:
                     label = 'false'
                     ax.add_patch(plt.Rectangle(xy=(0, 0), width=gallery_img.shape[1] - 1,
                                                height=gallery_img.shape[0] - 1,
-                                               edgecolor=(0, 0, 1), fill=False, linewidth=5))
+                                               edgecolor=(1, 0, 0), fill=False, linewidth=5))
                 ax.imshow(gallery_img)
                 ax.set_title(f'{self.sim[q_idx, sort_idx[i]]:.3f}/{label}/cam{cam_id}')
                 ax.axis("off")
@@ -135,7 +135,7 @@ class Visualizer:
             filepath = os.path.join(output, "{}.jpg".format(cnt))
             fig.savefig(filepath)
 
-    def vis_rank_list(self, output, vis_label, num_vis=100, rank_sort="ascending", label_sort="ascending", max_rank=5,
+    def vis_rank_list(self, output, vis_label, num_vis=100, rank_sort="descending", label_sort="descending", max_rank=5,
                       actmap=False):
         r"""Visualize rank list of query instance
         Args:

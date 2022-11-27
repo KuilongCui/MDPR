@@ -8,11 +8,18 @@
 # https://github.com/KaiyangZhou/deep-person-reid/blob/master/torchreid/models/osnet.py
 
 import logging
+import math
 
 import torch
 from torch import nn
 
-from fastreid.layers import get_norm
+from fastreid.layers import (
+    IBN,
+    SELayer,
+    Non_local,
+    get_norm,
+)
+
 from fastreid.utils import comm
 from fastreid.utils.checkpoint import get_missing_parameters_message, get_unexpected_parameters_message
 from .build import BACKBONE_REGISTRY

@@ -96,8 +96,7 @@ def eval_cuhk03(distmat, q_pids, g_pids, q_camids, g_camids, max_rank):
     return all_cmc, mAP
 
 
-def eval_market1501(distmat, q_pids, g_pids, q_camids, g_camids, max_rank,
-        query_path, gallery_path, output_attention, log_path=""):
+def eval_market1501(distmat, q_pids, g_pids, q_camids, g_camids, max_rank):
     """Evaluation with market1501 metric
     Key: for each query identity, its gallery images from the same camera view are discarded.
     """
@@ -112,7 +111,6 @@ def eval_market1501(distmat, q_pids, g_pids, q_camids, g_camids, max_rank,
     all_cmc = []
     all_AP = []
     all_INP = []
-    save_infos = []
     num_valid_q = 0.  # number of valid query
 
     for q_idx in range(num_q):
@@ -128,20 +126,6 @@ def eval_market1501(distmat, q_pids, g_pids, q_camids, g_camids, max_rank,
         # compute cmc curve
         matches = (g_pids[order] == q_pid).astype(np.int32)
         raw_cmc = matches[keep]  # binary vector, positions with value 1 are correct matches
-
-        num_total = np.sum(g_pids == q_pid)
-
-        line = ""
-        order = indices[q_idx]
-        for i in range(num_total):
-            line += " " + str(gallery_path[order[i]])
-
-        save_g = line
-        save_g_label = matches[:num_total]
-        save_q = query_path[q_idx]
-        save_info = [save_q, save_g, save_g_label]
-        save_infos.append(save_info)
-
         if not np.any(raw_cmc):
             # this condition is true when query identity does not appear in gallery
             continue
@@ -168,9 +152,6 @@ def eval_market1501(distmat, q_pids, g_pids, q_camids, g_camids, max_rank,
         all_AP.append(AP)
 
     assert num_valid_q > 0, 'Error: all query identities do not appear in gallery'
-    
-    if output_attention:
-        np.save(log_path+'/mismatch.npy', save_infos, allow_pickle=True)
 
     all_cmc = np.asarray(all_cmc).astype(np.float32)
     all_cmc = all_cmc.sum(0) / num_valid_q
@@ -178,12 +159,11 @@ def eval_market1501(distmat, q_pids, g_pids, q_camids, g_camids, max_rank,
     return all_cmc, all_AP, all_INP
 
 
-def evaluate_py(distmat, q_pids, g_pids, q_camids, g_camids, max_rank, use_metric_cuhk03, 
-    query_path, gallery_path, output_attention, log_path):
+def evaluate_py(distmat, q_pids, g_pids, q_camids, g_camids, max_rank, use_metric_cuhk03):
     if use_metric_cuhk03:
         return eval_cuhk03(distmat, q_pids, g_pids, q_camids, g_camids, max_rank)
     else:
-        return eval_market1501(distmat, q_pids, g_pids, q_camids, g_camids, max_rank, query_path, gallery_path, output_attention, log_path)
+        return eval_market1501(distmat, q_pids, g_pids, q_camids, g_camids, max_rank)
 
 
 def evaluate_rank(
@@ -192,13 +172,9 @@ def evaluate_rank(
         g_pids,
         q_camids,
         g_camids,
-        query_path,
-        gallery_path,
-        output_mismatch=False,
-        log_path="",
-        max_rank=10,
+        max_rank=50,
         use_metric_cuhk03=False,
-        use_cython=False,
+        use_cython=True,
 ):
     """Evaluates CMC rank.
     Args:
@@ -218,10 +194,7 @@ def evaluate_rank(
             This is highly recommended as the cython code can speed up the cmc computation
             by more than 10x. This requires Cython to be installed.
     """
-    if output_mismatch == False:
-        use_cython = True
-
     if use_cython and IS_CYTHON_AVAI:
         return evaluate_cy(distmat, q_pids, g_pids, q_camids, g_camids, max_rank, use_metric_cuhk03)
     else:
-        return evaluate_py(distmat, q_pids, g_pids, q_camids, g_camids, max_rank, use_metric_cuhk03, query_path, gallery_path, output_mismatch, log_path)
+        return evaluate_py(distmat, q_pids, g_pids, q_camids, g_camids, max_rank, use_metric_cuhk03)

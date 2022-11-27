@@ -6,6 +6,7 @@
 
 import argparse
 import logging
+import os
 import sys
 
 import numpy as np
@@ -15,7 +16,7 @@ from torch.backends import cudnn
 
 sys.path.append('.')
 
-from fastreid.evaluation import evaluate_rank
+from fastreid.evaluation.rank import evaluate_rank
 from fastreid.config import get_cfg
 from fastreid.utils.logger import setup_logger
 from fastreid.data import build_reid_test_loader
@@ -72,17 +73,17 @@ def get_parser():
     )
     parser.add_argument(
         "--num-vis",
-        default=100,
+        default=800,
         help="number of query images to be visualized",
     )
     parser.add_argument(
         "--rank-sort",
-        default="ascending",
+        default="descending",
         help="rank order of visualization images by AP metric",
     )
     parser.add_argument(
         "--label-sort",
-        default="ascending",
+        default="descending",
         help="label order of visualization images by cosine similarity metric",
     )
     parser.add_argument(
@@ -101,6 +102,10 @@ def get_parser():
 
 if __name__ == '__main__':
     args = get_parser().parse_args()
+
+    if not os.path.isdir(args.output):
+        os.makedirs(args.output)
+    
     cfg = setup_cfg(args)
     test_loader, num_query = build_reid_test_loader(cfg, dataset_name=args.dataset_name)
     demo = FeatureExtractionDemo(cfg, parallel=args.parallel)
@@ -133,10 +138,10 @@ if __name__ == '__main__':
     visualizer = Visualizer(test_loader.dataset)
     visualizer.get_model_output(all_ap, distmat, q_pids, g_pids, q_camids, g_camids)
 
-    logger.info("Start saving ROC curve ...")
-    fpr, tpr, pos, neg = visualizer.vis_roc_curve(args.output)
-    visualizer.save_roc_info(args.output, fpr, tpr, pos, neg)
-    logger.info("Finish saving ROC curve!")
+    # logger.info("Start saving ROC curve ...")
+    # fpr, tpr, pos, neg = visualizer.vis_roc_curve(args.output)
+    # visualizer.save_roc_info(args.output, fpr, tpr, pos, neg)
+    # logger.info("Finish saving ROC curve!")
 
     logger.info("Saving rank list result ...")
     query_indices = visualizer.vis_rank_list(args.output, args.vis_label, args.num_vis,

@@ -41,8 +41,8 @@ class ReidEvaluator(DatasetEvaluator):
         prediction = {
             'feats': outputs.to(self._cpu_device, torch.float32),
             'pids': inputs['targets'].to(self._cpu_device),
-            'camids': inputs['camids'].to(self._cpu_device),
-            'img_paths':inputs['img_paths']
+            'camids': inputs['camids'].to(self._cpu_device)
+
         }
         self._predictions.append(prediction)
 
@@ -61,13 +61,10 @@ class ReidEvaluator(DatasetEvaluator):
         features = []
         pids = []
         camids = []
-        img_paths = []
-
         for prediction in predictions:
             features.append(prediction['feats'])
             pids.append(prediction['pids'])
             camids.append(prediction['camids'])
-            img_paths.extend(prediction['img_paths'])
 
         features = torch.cat(features, dim=0)
         pids = torch.cat(pids, dim=0).numpy()
@@ -82,10 +79,6 @@ class ReidEvaluator(DatasetEvaluator):
         gallery_pids = pids[self._num_query:]
         gallery_camids = camids[self._num_query:]
 
-        #  query_path, gallery_path
-        query_path = img_paths[:self._num_query]
-        gallery_path = img_paths[self._num_query:]
-
         self._results = OrderedDict()
 
         if self.cfg.TEST.AQE.ENABLED:
@@ -95,14 +88,7 @@ class ReidEvaluator(DatasetEvaluator):
             alpha = self.cfg.TEST.AQE.ALPHA
             query_features, gallery_features = aqe(query_features, gallery_features, qe_time, qe_k, alpha)
 
-        # query_features = query_features.view(query_features.shape[0], 4 ,-1)
-        # gallery_features = gallery_features.view(gallery_features.shape[0], 4, -1)
-        # dist1 = build_dist(query_features[:,0,:], gallery_features[:,0,:], self.cfg.TEST.METRIC)
-        # dist2 = build_dist(query_features[:,1,:], gallery_features[:,1,:], self.cfg.TEST.METRIC)
-        # dist3 = build_dist(query_features[:,2,:], gallery_features[:,2,:], self.cfg.TEST.METRIC)
-        # dist4 = build_dist(query_features[:,3,:], gallery_features[:,3,:], self.cfg.TEST.METRIC)
-        # dist = dist1 + dist2 + dist3 + dist4
-        dist =  build_dist(query_features, gallery_features, self.cfg.TEST.METRIC)
+        dist = build_dist(query_features, gallery_features, self.cfg.TEST.METRIC)
 
         if self.cfg.TEST.RERANK.ENABLED:
             logger.info("Test with rerank setting")
@@ -118,9 +104,7 @@ class ReidEvaluator(DatasetEvaluator):
             dist = rerank_dist * (1 - lambda_value) + dist * lambda_value
 
         from .rank import evaluate_rank
-
-        cmc, all_AP, all_INP = evaluate_rank(dist, query_pids, gallery_pids, query_camids, gallery_camids,
-            query_path, gallery_path, log_path=self.cfg.OUTPUT_DIR, output_mismatch=self.cfg.MISMTACH_OUTPUT)
+        cmc, all_AP, all_INP = evaluate_rank(dist, query_pids, gallery_pids, query_camids, gallery_camids)
 
         mAP = np.mean(all_AP)
         mINP = np.mean(all_INP)

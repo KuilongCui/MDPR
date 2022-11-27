@@ -1,0 +1,43 @@
+_BASE_: ../Base-SBS.yml
+
+DATASETS:
+  NAMES: ("DukeMTMC",)
+  TESTS: ("DukeMTMC",)
+
+OUTPUT_DIR: A2MGN/DukeMTMC/
+
+MODEL:
+  META_ARCHITECTURE: A2MGN
+
+  BACKBONE:
+    WITH_NL: False
+    DEPTH: 50x
+    PRETRAIN: True
+    LAST_STRIDE: 1
+
+  LOSSES:
+    TRI:
+      HARD_MINING: true
+      MARGIN: 0.1
+      NORM_FEAT: False
+      SCALE: 1.0
+        
+  HEADS:
+    NORM: BN
+    ATTN: 32
+    EMBEDDING_DIM: 256
+
+SOLVER:
+  AMP:
+    ENABLED: True
+    
+  IMS_PER_BATCH: 64
+
+  MAX_EPOCH: 60
+
+  FREEZE_ITERS: 0
+
+  CHECKPOINT_PERIOD: 20
+TEST:
+  EVAL_PERIOD: 10
+  IMS_PER_BATCH: 64

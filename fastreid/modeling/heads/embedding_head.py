@@ -41,9 +41,6 @@ class EmbeddingHead(nn.Module):
             margin,
             with_bnneck,
             norm_type,
-            attn_num,
-            out_attn,
-            output_dir
     ):
         """
         NOTE: this interface is experimental.
@@ -65,16 +62,11 @@ class EmbeddingHead(nn.Module):
         # Pooling layer
         assert hasattr(pooling, pool_type), "Expected pool types are {}, " \
                                             "but got {}".format(pooling.__all__, pool_type)
-        self.pool_layer = getattr(pooling, pool_type)(feat_dim=feat_dim,
-            attn_num=attn_num, attn_output=out_attn, output_dir=output_dir)
+        self.pool_layer = getattr(pooling, pool_type)()
 
         self.neck_feat = neck_feat
 
         self.pool_type = pool_type
-        if pool_type == 'BilinearAttnPool':
-            feat_dim = feat_dim * attn_num
-            embedding_dim = embedding_dim * attn_num
-
         neck = []
         if embedding_dim > 0:
             neck.append(nn.Conv2d(feat_dim, embedding_dim, 1, 1, bias=False))
@@ -98,10 +90,11 @@ class EmbeddingHead(nn.Module):
         nn.init.normal_(self.weight, std=0.01)
 
     @classmethod
-    def from_config(cls, cfg, attn_head=False, last_feat=None):
+    def from_config(cls, cfg, dim_spec=None, embedding_spec=None, pool_spec=None, num_classes_spec=None, with_bnneck_spec=None):
         # fmt: off
         feat_dim      = cfg.MODEL.BACKBONE.FEAT_DIM
         embedding_dim = cfg.MODEL.HEADS.EMBEDDING_DIM
+        backbone_embedding_dim = cfg.MODEL.BACKBONE.EMBEDDING_DIM
         num_classes   = cfg.MODEL.HEADS.NUM_CLASSES
         neck_feat     = cfg.MODEL.HEADS.NECK_FEAT
         pool_type     = cfg.MODEL.HEADS.POOL_LAYER
@@ -110,21 +103,24 @@ class EmbeddingHead(nn.Module):
         margin        = cfg.MODEL.HEADS.MARGIN
         with_bnneck   = cfg.MODEL.HEADS.WITH_BNNECK
         norm_type     = cfg.MODEL.HEADS.NORM
-        attn_num      = cfg.MODEL.HEADS.ATTN
-        attn_output   = cfg.ATTN_OUTPUT
-        output_dir    = cfg.OUTPUT_DIR
 
-        if cfg.MODEL.BACKBONE.EMBEDDING_DIM != 0:
-            feat_dim = cfg.MODEL.BACKBONE.EMBEDDING_DIM
-            
-        if attn_head:
-            feat_dim = feat_dim * attn_num
-            embedding_dim = embedding_dim * attn_num
-            pool_type = 'Identity'
+        if backbone_embedding_dim != 0:
+            feat_dim = backbone_embedding_dim
 
-        if last_feat is not None:
-            feat_dim = last_feat
-            pool_type = 'Identity'
+        if dim_spec:
+            feat_dim = dim_spec
+
+        if embedding_spec:
+            embedding_dim = embedding_spec
+
+        if pool_spec:
+            pool_type = pool_spec
+
+        if num_classes_spec is not None:
+            num_classes = num_classes_spec
+
+        if with_bnneck_spec is not None:
+            with_bnneck = with_bnneck_spec
 
         # fmt: on
         return {
@@ -138,19 +134,13 @@ class EmbeddingHead(nn.Module):
             'margin': margin,
             'with_bnneck': with_bnneck,
             'norm_type': norm_type,
-            'attn_num': attn_num,
-            'out_attn': attn_output,
-            'output_dir': output_dir,
         }
 
     def forward(self, features, targets=None, batched_inputs=None):
         """
         See :class:`ReIDHeads.forward`.
         """
-        if self.pool_type == 'BilinearAttnPool':
-            pool_feat = self.pool_layer(features, batched_inputs)
-        else:
-            pool_feat = self.pool_layer(features)
+        pool_feat = self.pool_layer(features)
 
         neck_feat = self.bottleneck(pool_feat)
         neck_feat = neck_feat[..., 0, 0]

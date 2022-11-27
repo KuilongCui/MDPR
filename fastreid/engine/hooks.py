@@ -482,7 +482,7 @@ class LayerFreeze(HookBase):
             if not hasattr(self.model, layer):
                 self._logger.info(f'{layer} is not an attribute of the model, will skip this layer')
 
-        for name, module in self.model.named_children():
+        for name, module in self.model.named_children():          
             if name in self.freeze_layers:
                 # Change BN in freeze layers to eval mode
                 module.eval()

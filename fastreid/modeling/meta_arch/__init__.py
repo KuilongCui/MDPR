@@ -8,14 +8,6 @@ from .build import META_ARCH_REGISTRY, build_model
 
 
 # import all the meta_arch, so they will be registered
-from .baseline import Baseline
-from .mgn import MGN
-from .moco import MoCo
-from .distiller import Distiller
-from .sbaseline import Sbaseline
-from .OsNetSbaseline import OsNetSbaseline
-from .GanSbaseline import GanSbaseline
-from .PartSbaseline import PartSbaseline
-from .RepVggSbaseline import RepVggSbaseline
-from .sbaselineT import SbaselineT
-from .sbaselineCam import SbaselineCam
+
+from .a2mgn import A2MGN
+from .mdpr import MDPR

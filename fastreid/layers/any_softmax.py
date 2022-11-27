@@ -6,12 +6,14 @@
 
 import torch
 import torch.nn as nn
+import math
 
 __all__ = [
     "Linear",
     "ArcSoftmax",
     "CosSoftmax",
-    "CircleSoftmax"
+    "CircleSoftmax",
+    "CurricularSoftmax"
 ]
 
 
@@ -65,6 +67,12 @@ class CircleSoftmax(Linear):
         # When use model parallel, there are some targets not in class centers of local rank
         index = torch.where(targets != -1)[0]
         m_hot = torch.zeros(index.size()[0], logits.size()[1], device=logits.device, dtype=logits.dtype)
+
+        # print(index)
+        # print(m_hot.shape)
+        # print(targets[index, None])
+        # assert 1==0
+
         m_hot.scatter_(1, targets[index, None], 1)
 
         logits_p = alpha_p * (logits - delta_p)
@@ -78,3 +86,44 @@ class CircleSoftmax(Linear):
         logits.mul_(self.s)
 
         return logits
+    
+class CurricularSoftmax(nn.Module):
+    def __init__(self, num_classes, scale, margin):
+        super(CurricularSoftmax, self).__init__()
+        self.num_classes = num_classes
+
+        m = margin
+        self.m = margin
+        self.s = scale
+        self.cos_m = math.cos(m)
+        self.sin_m = math.sin(m)
+        self.threshold = math.cos(math.pi - m)
+        self.mm = math.sin(math.pi - m) * m
+
+        # self.register_buffer('t', torch.zeros(1))
+
+    def forward(self, cos_theta, label):
+        cos_theta = cos_theta.clamp(-1, 1)  # for numerical stability
+
+        target_logit = cos_theta[torch.arange(0, cos_theta.size(0)), label].view(-1, 1)
+
+        sin_theta = torch.sqrt(1.0 - torch.pow(target_logit, 2))
+
+        cos_theta_m = target_logit * self.cos_m - sin_theta * self.sin_m # cos(target+margin)
+        
+        mask = cos_theta > cos_theta_m
+        final_target_logit = torch.where(target_logit > self.threshold, cos_theta_m, target_logit - self.mm)
+        
+        hard_example = cos_theta[mask]
+
+        with torch.no_grad():
+            self.t = target_logit.mean() * 0.001 + (1 - 0.001) * self.t
+        cos_theta[mask] = hard_example * (self.t.half() + hard_example)
+
+        cos_theta.scatter_(1, label.view(-1, 1).long(), final_target_logit.half())
+        output = cos_theta * self.s
+        
+        return output
+
+    def extra_repr(self):
+        return f"num_classes={self.num_classes}, scale={self.s}, margin={self.m}"

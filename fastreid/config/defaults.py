@@ -33,12 +33,6 @@ _C.MODEL.QUEUE_SIZE = 8192
 # ---------------------------------------------------------------------------- #
 _C.MODEL.BACKBONE = CN()
 
-# attn detach
-_C.MODEL.DETACH_ATTN = False
-
-# detach all branch
-_C.MODEL.DETACH_ALL = False
-
 _C.MODEL.LAST_EMBEDDING = False
 _C.MODEL.LAST_ONLY = True
 
@@ -68,33 +62,6 @@ _C.MODEL.BACKBONE.PRETRAIN_PATH = ''
 
 # EMBEDDING DIM
 _C.MODEL.BACKBONE.EMBEDDING_DIM = 0
-# ATTACH WITH BN and Relu
-_C.MODEL.BACKBONE.ATTACH_ACTIVATION = True
-
-# AttnShaped WITH BN and Relu
-_C.MODEL.BACKBONE.ATTNSHAPED_ACTIVATION = True
-
-# adj Keep
-_C.MODEL.BACKBONE.ADJ_KEEP = False
-
-# Swin Transformer parameters
-_C.MODEL.SWIN = CN()
-_C.MODEL.SWIN.PATCH_SIZE = 4
-_C.MODEL.SWIN.IN_CHANS = 3
-_C.MODEL.SWIN.EMBED_DIM = 96
-_C.MODEL.SWIN.DEPTHS = [2, 2, 6, 2]
-_C.MODEL.SWIN.NUM_HEADS = [3, 6, 12, 24]
-_C.MODEL.SWIN.WINDOW_SIZE = 7
-_C.MODEL.SWIN.MLP_RATIO = 4.
-_C.MODEL.SWIN.QKV_BIAS = True
-_C.MODEL.SWIN.QK_SCALE = None
-_C.MODEL.SWIN.APE = False
-_C.MODEL.SWIN.PATCH_NORM = True
-# DropBlock
-_C.MODEL.DROP = CN()
-_C.MODEL.DROP.ENABLED = False
-_C.MODEL.DROP.H_RATIO = 0.15
-_C.MODEL.DROP.W_RATIO = 1.0
 
 # ---------------------------------------------------------------------------- #
 # REID HEADS options
@@ -270,6 +237,10 @@ _C.DATASETS.TESTS = ("Market1501",)
 # Combine trainset and testset joint training
 _C.DATASETS.COMBINEALL = False
 
+_C.DATASETS.CUHK03_LABELED = True
+
+_C.DATASETS.MSMT17_V = 1
+
 # -----------------------------------------------------------------------------
 # DataLoader
 # -----------------------------------------------------------------------------
@@ -386,16 +357,46 @@ _C.TEST.PRECISE_BN.NUM_ITER = 300
 # ---------------------------------------------------------------------------- #
 # Misc options
 # ---------------------------------------------------------------------------- #
-_C.OUTPUT_DIR = "logs/"
-
-# mismatch output
-_C.MISMTACH_OUTPUT = False
-
-# attention output
-_C.ATTN_OUTPUT = False
 
 # Benchmark different cudnn algorithms.
 # If input images have very different sizes, this option will have large overhead
 # for about 10k iterations. It usually hurts total time, but can benefit for certain models.
 # If input images have the same or similar sizes, benchmark is often helpful.
 _C.CUDNN_BENCHMARK = False
+
+_C.ATTN_TYPE = 'PAM' # or "CAM"
+
+_C.CHANNEL_POOL = 'GlobalMaxPool'
+
+_C.OUTPUT_DIR = "logs/"
+
+_C.OUTPUT_ALL = False
+
+_C.ENABLE_BRANCH = '2_3_attn'
+
+_C.IDENTITY = False
+
+_C.ENABLE_UPSAMPLE = '2_3_none'
+
+_C.ENABLE_GAT = False
+
+_C.ATTN_GUIDED = True
+
+_C.STAGE = 'first'
+
+_C.STAGE_PATH = ''
+
+_C.GENERATE_ATTN = 8
+
+_C.FUSION_ENABLE = True
+
+_C.DISTILLATION_ENABLE = True
+
+_C.BETA = 0.001
+
+_C.ATTN_NUM = 2
+
+_C.PART_NUM = 2
+
+_C.MODEL.LOSSES.ATTN_DIVERSITY = CN()
+_C.MODEL.LOSSES.ATTN_DIVERSITY.SCALE = 0.001
