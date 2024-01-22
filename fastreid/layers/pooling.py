@@ -22,7 +22,6 @@ __all__ = [
     'FastGlobalAvgPool',
     'AdaptiveAvgMaxPool',
     'ClipGlobalAvgPool',
-    'BilinearAttnPool'
 ]
 
 

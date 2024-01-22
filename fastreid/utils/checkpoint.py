@@ -339,10 +339,10 @@ class PeriodicCheckpointer:
                 "model_{:04d}".format(epoch), **additional_state
             )
         if epoch >= self.max_epoch - 1:
-            if additional_state["metric"] > self.best_metric:
-                self.checkpointer.save(
-                    "model_best", **additional_state
-                )
+            # if additional_state["metric"] > self.best_metric:
+            #     self.checkpointer.save(
+            #         "model_best", **additional_state
+            #     )
             self.checkpointer.save("model_final", **additional_state)
 
     def save(self, name: str, **kwargs: Any):

@@ -23,7 +23,7 @@ from fastreid.modeling.meta_arch.build import META_ARCH_REGISTRY
 from fastreid.modeling.heads import build_heads
 
 @META_ARCH_REGISTRY.register()  # type: ignore
-class MDPR(nn.Module):
+class MDPREX(nn.Module):
     """
     Baseline architecture. Any models that contains the following two components:
     1. Per-image feature extraction (aka backbone)
@@ -32,7 +32,7 @@ class MDPR(nn.Module):
 
     @configurable
     def __init__(
-            self, *, output_all, output_dir, attn_guide, pixel_mean, pixel_std, distillation_able, \
+            self, *, output_all, output_dir, attn_guide, pixel_mean, pixel_std, distillation_able, attn_diversity_loss_enable, \
             feat_dim, backbone_embedding_dim, attn_num, backbone, attn_backbone, attn_feature4_head, attn_feature3_head, \
             attn_bap_feature4_head, attn_bap_feature3_head, part_backbone, hard_global_head, part_num, hard_part_head, \
             fusion_enable, fusion_feat_head, loss_kwargs
@@ -51,6 +51,7 @@ class MDPR(nn.Module):
         self.attn_guide = attn_guide
         self.distillation_able = distillation_able
         self.fusion_enable = fusion_enable
+        self.attn_diversity_loss_enable = attn_diversity_loss_enable
 
         # ------------- pre-process -------------
         self.register_buffer('pixel_mean', torch.Tensor(pixel_mean).view(1, -1, 1, 1), False)
@@ -79,14 +80,8 @@ class MDPR(nn.Module):
 
         # ------------- mutual distilltion mlp -----------------------
         if self.distillation_able:
-            self.predictor1 = nn.Sequential(nn.Linear(backbone_embedding_dim, backbone_embedding_dim, bias=False),
-                                    nn.BatchNorm1d(backbone_embedding_dim),
-                                    nn.ReLU(inplace=True), # hidden layer
-                                    nn.Linear(backbone_embedding_dim, backbone_embedding_dim))
-            self.predictor2 = nn.Sequential(nn.Linear(backbone_embedding_dim, backbone_embedding_dim, bias=False),
-                                    nn.BatchNorm1d(backbone_embedding_dim),
-                                    nn.ReLU(inplace=True), # hidden layer
-                                    nn.Linear(backbone_embedding_dim, backbone_embedding_dim))
+            self.predictor1 = DomainTransfer(backbone_embedding_dim, backbone_embedding_dim)
+            self.predictor2 = DomainTransfer(backbone_embedding_dim, backbone_embedding_dim)
 
         # ------------- loss -----------------------
         self.loss_kwargs = loss_kwargs
@@ -148,6 +143,7 @@ class MDPR(nn.Module):
             'pixel_mean': cfg.MODEL.PIXEL_MEAN,
             'pixel_std': cfg.MODEL.PIXEL_STD,
             'distillation_able': cfg.DISTILLATION_ENABLE,
+            'attn_diversity_loss_enable': cfg.ATTN_DIVERSITY_LOSS_ENABLE,
             
             # --------- config ---------
             'attn_guide': cfg.ATTN_GUIDED,
@@ -221,7 +217,7 @@ class MDPR(nn.Module):
             # ------------- hard content branch -------------
             outputs_hard_global = self.hard_global_head(hard_global_feat, targets, batched_inputs=batched_inputs)
             self.losses(outputs_hard_global, targets, self.loss_kwargs['loss_names'], "hard_global", losses)
-            
+
             for i in range(self.part_num):
                 outputs_hard_part = self.hard_part_head[i](hard_part_feat[i], targets, batched_inputs=batched_inputs)
                 self.losses(outputs_hard_part, targets, self.loss_kwargs['loss_names'], "hard_part_"+str(i), losses)
@@ -233,17 +229,19 @@ class MDPR(nn.Module):
             attn_bap_feature4_output = self.attn_bap_feature4_head(attn_bap_feature4, targets, batched_inputs=batched_inputs)
             self.losses(attn_bap_feature4_output, targets, 'CrossEntropyLoss', "attn_bap4", losses, log=True)
 
-            losses['loss_diversity_loss_4'] = cross_catgory_loss(attn_bap_pool_feature4)
-            losses['loss_diversity_loss_reg_4'] = torch.sum(a4) / a4.shape[0] * self.loss_kwargs.get('attn_diversity').get('scale')
+            if self.attn_diversity_loss_enable:
+                losses['loss_diversity_loss_4'] = cross_catgory_loss(attn_bap_pool_feature4)
+                losses['loss_diversity_loss_reg_4'] = torch.sum(a4) / a4.shape[0] * self.loss_kwargs.get('attn_diversity').get('scale')
 
             attn_feature3_output = self.attn_feature3_head(attn_feature3, targets, batched_inputs=batched_inputs)
             self.losses(attn_feature3_output, targets, self.loss_kwargs['loss_names'], "attn_feature3", losses)
             
             attn_bap_feature3_output = self.attn_bap_feature3_head(attn_bap_feature3, targets, batched_inputs=batched_inputs)
             self.losses(attn_bap_feature3_output, targets, 'CrossEntropyLoss', "attn_bap3", losses)
-
-            losses['loss_diversity_loss_3'] = cross_catgory_loss(attn_bap_pool_feature3)
-            losses['loss_diversity_loss_reg_3'] = torch.sum(a3) / a3.shape[0] * self.loss_kwargs.get('attn_diversity').get('scale')
+            
+            if self.attn_diversity_loss_enable:
+                losses['loss_diversity_loss_3'] = cross_catgory_loss(attn_bap_pool_feature3)
+                losses['loss_diversity_loss_reg_3'] = torch.sum(a3) / a3.shape[0] * self.loss_kwargs.get('attn_diversity').get('scale')
 
             # ------------- fusion -------------
             if self.fusion_enable:
@@ -252,7 +250,7 @@ class MDPR(nn.Module):
             
             # ------------- mututal distillation loss -------------
             if self.distillation_able:
-                z1,z2 = outputs_hard_global['features'], attn_feature4_output['features']
+                z1, z2 = outputs_hard_global['features'], attn_feature4_output['features']
                 p1, p2 = self.predictor1(z1), self.predictor2(z2)
 
                 losses['loss_mutual_distillation'] = -(torch.cosine_similarity(p1, z2.detach()).mean() + \
@@ -576,6 +574,19 @@ class Embedding(nn.Module):
         f = self.embedding(features)
         f = self.bn(f)
         return F.relu(f, inplace=True)
+
+class DomainTransfer(nn.Module):
+    def __init__(self, in_dim, out_dim, bias=True):
+        super(DomainTransfer, self).__init__()
+
+        self.conv = nn.Sequential(nn.Linear(in_dim, out_dim, bias=False),
+                                    nn.BatchNorm1d(out_dim),
+                                    nn.ReLU(inplace=True),
+                                    nn.Linear(out_dim, out_dim, bias=bias))
+        self.conv.apply(weights_init_kaiming)
+    
+    def forward(self, x):
+        return self.conv(x)
 
 def cross_catgory_loss(x, gamma=1.):
     nparts = len(x)

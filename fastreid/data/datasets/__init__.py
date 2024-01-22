@@ -35,6 +35,7 @@ from .shinpuhkan import Shinpuhkan
 from .wildtracker import WildTrackCrop
 from .cuhk_sysu import cuhkSYSU
 from .synergyreid import SynergyReID
+from .CrowdPRW import CrowdPRW
 # Vehicle re-id datasets
 from .veri import VeRi
 from .vehicleid import VehicleID, SmallVehicleID, MediumVehicleID, LargeVehicleID

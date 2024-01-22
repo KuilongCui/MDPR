@@ -2,6 +2,7 @@ datasets/DukeMTMC-reID*
 datasets/synergyreid_data*
 datasets/Market*
 datasets/MSMT17*
+datasets/Crowd-PRW-v16.04.20*
 weights/*.pth
 logs/
 *backup/

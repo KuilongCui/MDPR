@@ -19,3 +19,5 @@ def add_mdpr_cfg(cfg):
     _C.DISTILLATION_ENABLE = True
 
     _C.OUTPUT_ALL = False
+
+    _C.ATTN_DIVERSITY_LOSS_ENABLE = True

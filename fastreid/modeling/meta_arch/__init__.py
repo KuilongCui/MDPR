@@ -11,3 +11,4 @@ from .build import META_ARCH_REGISTRY, build_model
 
 from .a2mgn import A2MGN
 from .mdpr import MDPR
+from .mdprex import MDPREX
